@@ -1,5 +1,9 @@
 package body Expressions is
 
+   ----------
+   -- Kind --
+   ----------
+
    function Kind (Self : Expression) return Expr_Type
    is
    begin

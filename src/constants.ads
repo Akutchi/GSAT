@@ -1,8 +1,12 @@
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 package Constants is
 
-   K_BEGIN  : constant String := "begin";
-   K_IS     : constant String := "is";
-   K_LOOP   : constant String := "loop";
-   K_THEN   : constant String := "then";
+   KEYWORDS : constant array (1 .. 4) of Unbounded_String := (
+      To_Unbounded_String ("loop"),
+      To_Unbounded_String ("then"),
+      To_Unbounded_String ("is"),
+      To_Unbounded_String ("begin")
+   );
 
 end Constants;

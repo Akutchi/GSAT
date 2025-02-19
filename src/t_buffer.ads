@@ -6,6 +6,8 @@ package T_Buffer is
 
    procedure Append (Buffer : in out Char_Buffer; Char : Character);
 
+   function Last (Buffer : Char_Buffer) return Character;
+
    procedure Clear (Buffer : in out Char_Buffer);
 
    function Has_Keyword (Buffer : Char_Buffer) return Boolean;
@@ -26,9 +28,9 @@ private
 
    end record;
 
-   function To_String
+   function Buffer_To_String
       (Buffer_V : Char_Buffer_V.Vector; First, Last : Natural)
    return String
-   with Pre => (First >= 0 and Last <= Natural (Buffer_V.Length));
+   with Pre => (Last <= Natural (Buffer_V.Length));
 
 end T_Buffer;

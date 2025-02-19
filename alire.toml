@@ -1,0 +1,10 @@
+name = "gbt"
+description = "transpilor from bada to ada"
+version = "0.1.0-dev"
+
+authors = ["Kaitlyn"]
+maintainers = ["Kaitlyn <kaitlyn.buffler@tutamail.com>"]
+maintainers-logins = ["Akutchi"]
+licenses = "MIT OR Apache-2.0 WITH LLVM-exception"
+website = ""
+tags = ["parser", "ada", "transpilor"]

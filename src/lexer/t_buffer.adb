@@ -27,12 +27,12 @@ package body T_Buffer is
 
    end Append;
 
-   procedure Append (Buffer : in out String_Buffer.Vector; Str : String)
+   procedure Append (Buffer : in out File_Buffer.Vector; Str : String)
    is
    begin
 
       if Str /= "" and then Str /= " " then
-         String_Buffer.Append (Buffer, Str);
+         File_Buffer.Append (Buffer, Str);
       end if;
 
    end Append;
@@ -101,7 +101,7 @@ package body T_Buffer is
 
    end Print;
 
-   procedure Print (Buffer : String_Buffer.Vector)
+   procedure Print (Buffer : File_Buffer.Vector)
    is
 
       Buffer_Last : constant Positive := Positive (Buffer.Last_Index);

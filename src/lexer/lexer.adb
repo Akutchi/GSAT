@@ -4,18 +4,18 @@ with Processing_Utils;
 package body Lexer is
 
    function Lexing (F : File_Type; Input : Stream_Access)
-   return T_Buffer.String_Buffer.Vector
+   return T_Buffer.File_Buffer.Vector
    is
 
       Exprs       : Expressions_List.Expr_List.Vector;
       Buffer      : T_Buffer.Char_Buffer;
-      Code_Tokens : T_Buffer.String_Buffer.Vector;
+      File_Tokens : T_Buffer.File_Buffer.Vector;
 
       In_Text  : Boolean := False;
       Char     : Character := '$';
    begin
 
-      T_Buffer.Append (Code_Tokens, Name (F));
+      T_Buffer.Append (File_Tokens, Name (F));
 
       while not End_Of_File (F) loop
 
@@ -31,13 +31,13 @@ package body Lexer is
 
          end loop;
 
-         T_Buffer.Append (Code_Tokens, T_Buffer.Buffer_To_String (Buffer));
+         T_Buffer.Append (File_Tokens, T_Buffer.Buffer_To_String (Buffer));
          Buffer.Clear;
 
          if Processing_Utils.EOL (Char, In_Text) then
 
             T_Buffer.Append (Buffer, Char);
-            T_Buffer.Append (Code_Tokens, T_Buffer.Buffer_To_String (Buffer));
+            T_Buffer.Append (File_Tokens, T_Buffer.Buffer_To_String (Buffer));
             Buffer.Clear;
 
          end if;
@@ -46,7 +46,7 @@ package body Lexer is
 
       end loop;
 
-      return Code_Tokens;
+      return File_Tokens;
 
    end Lexing;
 

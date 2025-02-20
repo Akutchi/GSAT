@@ -4,15 +4,24 @@ package T_Buffer is
 
    type Char_Buffer is tagged private;
 
+   package String_Buffer is new Ada.Containers.Indefinite_Vectors
+     (Index_Type => Positive,
+      Element_Type => String,
+      "=" => "=");
+
    procedure Append (Buffer : in out Char_Buffer; Char : Character);
+
+   procedure Append (Buffer : in out String_Buffer.Vector; Str : String);
 
    function Last (Buffer : Char_Buffer) return Character;
 
    procedure Clear (Buffer : in out Char_Buffer);
 
-   function Has_Keyword (Buffer : Char_Buffer) return Boolean;
+   function Buffer_To_String (Buffer : Char_Buffer) return String;
 
    procedure Print (Buffer : Char_Buffer);
+
+   procedure Print (Buffer : String_Buffer.Vector);
 
 private
 
@@ -27,10 +36,5 @@ private
       Buffer_V : Char_Buffer_V.Vector;
 
    end record;
-
-   function Buffer_To_String
-      (Buffer_V : Char_Buffer_V.Vector; First, Last : Natural)
-   return String
-   with Pre => (Last <= Natural (Buffer_V.Length));
 
 end T_Buffer;

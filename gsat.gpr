@@ -1,14 +1,14 @@
-with "config/gbt_config.gpr";
-project Gbt is
+with "config/gsat_config.gpr";
+project Gsat is
 
    for Source_Dirs use ("src/", "config/");
-   for Object_Dir use "obj/" & Gbt_Config.Build_Profile;
+   for Object_Dir use "obj/" & Gsat_Config.Build_Profile;
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "bin";
-   for Main use ("gbt.adb");
+   for Main use ("gsat.adb");
 
    package Compiler is
-      for Default_Switches ("Ada") use Gbt_Config.Ada_Compiler_Switches;
+      for Default_Switches ("Ada") use Gsat_Config.Ada_Compiler_Switches;
    end Compiler;
 
    package Binder is
@@ -19,4 +19,4 @@ project Gbt is
       for Artifacts (".") use ("share");
    end Install;
 
-end Gbt;
+end Gsat;

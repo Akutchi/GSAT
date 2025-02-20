@@ -1,9 +1,9 @@
-with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
-
-with T_Buffer;
-
 package Processing_Utils is
 
-   function EOL (Char : Character) return Boolean;
+   procedure Toogle (In_Text : in out Boolean;
+                     Char, Buffer_Last : Character);
+
+   function EOL (Char : Character; In_Text : Boolean)
+   return Boolean;
 
 end Processing_Utils;

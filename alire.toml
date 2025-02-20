@@ -1,5 +1,5 @@
-name = "gbt"
-description = "transpilor from bada to ada"
+name = "gsat"
+description = "transpilor from sugar-ada to ada"
 version = "0.1.0-dev"
 
 authors = ["Kaitlyn"]

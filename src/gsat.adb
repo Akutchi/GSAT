@@ -6,7 +6,7 @@ with Expressions_List;
 with T_Buffer;
 with Processing_Utils;
 
-procedure Gbt is
+procedure Gsat is
 
    V : Expressions.Expr_Visitor;
 
@@ -15,17 +15,16 @@ procedure Gbt is
 
    Exprs  : Expressions_List.Expr_List.Vector;
    Buffer : T_Buffer.Char_Buffer;
+   In_Text : Boolean := False;
 
    Char : Character := '$';
-   Test : String := "(lol)";
-   In_Text : Boolean := False;
 
 begin
 
    Open
      (File => F,
       Mode => In_File,
-      Name => "./src/gbt.adb");
+      Name => "./src/gsat.adb");
 
    Input := Stream (F);
 
@@ -35,7 +34,9 @@ begin
 
          Character'Read (Input, Char);
 
-         exit when Processing_Utils.EOL (Char);
+         Processing_Utils.Toogle (In_Text, Char, Buffer.Last);
+
+         exit when Processing_Utils.EOL (Char, In_Text);
 
          T_Buffer.Append (Buffer, Char);
 
@@ -44,7 +45,7 @@ begin
       T_Buffer.Print (Buffer);
       Buffer.Clear;
 
-      if Char = '(' or else Char = ')' then
+      if Processing_Utils.EOL (Char, In_Text) then
          T_Buffer.Append (Buffer, Char);
          T_Buffer.Print (Buffer);
          Buffer.Clear;
@@ -54,4 +55,4 @@ begin
 
    end loop;
 
-end Gbt;
+end Gsat;

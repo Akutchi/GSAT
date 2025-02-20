@@ -6,6 +6,8 @@ with Ada.Strings.Unbounded;
 
 package body T_Buffer is
 
+   package SU renames Ada.Strings.Unbounded;
+
    ------------
    -- Append --
    ------------
@@ -72,16 +74,16 @@ package body T_Buffer is
 
       Buffer_V : constant Char_Buffer_V.Vector := Buffer.Buffer_V;
 
-      Tmp : Ada.Strings.Unbounded.Unbounded_String :=
-         Ada.Strings.Unbounded.Null_Unbounded_String;
+      Tmp : SU.Unbounded_String :=
+         SU.Null_Unbounded_String;
 
    begin
 
       for I in Buffer_V.First_Index .. Buffer_V.Last_Index loop
-         Ada.Strings.Unbounded.Append (Tmp, Buffer_V (I));
+         SU.Append (Tmp, Buffer_V (I));
       end loop;
 
-      return Ada.Strings.Unbounded.To_String (Tmp);
+      return SU.To_String (Tmp);
 
    end Buffer_To_String;
 

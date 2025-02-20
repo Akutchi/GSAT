@@ -1,11 +1,16 @@
 with Ada.Text_IO;              use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
 
+with Ada.Command_Line;
+
 with Expressions;
 with T_Buffer;
 with Lexer;
+with Gsat_System;
 
 procedure Gsat is
+
+   package CLI renames Ada.Command_Line;
 
    V : Expressions.Expr_Visitor;
 
@@ -16,15 +21,29 @@ procedure Gsat is
 
 begin
 
-   Open
-     (File => F,
-      Mode => In_File,
-      Name => "./src/gsat.adb");
+   if CLI.Argument_Count > 0 then
 
-   Input := Stream (F);
+      declare
 
-   Code_Tokens := Lexer.Lexing (F, Input);
+         Src_Path : constant String := CLI.Argument (1);
 
-   T_Buffer.Print (Code_Tokens);
+      begin
+
+         Gsat_System.Go_Trough_Level (Src_Path);
+
+         Open
+         (File => F,
+            Mode => In_File,
+            Name => "./src/gsat.adb");
+
+         Input := Stream (F);
+
+         Code_Tokens := Lexer.Lexing (F, Input);
+
+         T_Buffer.Print (Code_Tokens);
+
+      end;
+
+   end if;
 
 end Gsat;

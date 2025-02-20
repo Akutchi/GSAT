@@ -1,12 +1,7 @@
 with Ada.Text_IO;             use Ada.Text_IO;
-with Ada.Containers;          use Ada.Containers;
 with Ada.Characters.Latin_1;  use Ada.Characters.Latin_1;
 
-with Ada.Strings.Unbounded;
-
 package body T_Buffer is
-
-   package SU renames Ada.Strings.Unbounded;
 
    ------------
    -- Append --
@@ -16,24 +11,45 @@ package body T_Buffer is
    is
 
       Is_Tab : constant Boolean :=
-         (Buffer.Buffer_V.Is_Empty and then Char = ' ');
+         (Buffer.Char_Vector.Is_Empty and then Char = ' ');
    begin
 
       if Is_Tab or else Char = LF then
          return;
       end if;
 
-      Char_Buffer_V.Append (Buffer.Buffer_V, Char);
+      Char_Buffer_V.Append (Buffer.Char_Vector, Char);
 
    end Append;
 
-   procedure Append (Buffer : in out File_Buffer.Vector; Str : String)
+   procedure Append (Buffer : in out Char_Buffer; Str : String)
    is
    begin
 
+      for c of Str loop
+         Char_Buffer_V.Append (Buffer.Char_Vector, c);
+      end loop;
+
+   end Append;
+
+   procedure Append (Buffer : in out File_Buffer'Class; C_Buffer : Char_Buffer)
+   is
+      Str : constant String := Buffer_To_String (C_Buffer);
+   begin
+
       if Str /= "" and then Str /= " " then
-         File_Buffer.Append (Buffer, Str);
+
+         File_Buffer_V.Append (Buffer.Char_Buffer_Vector, C_Buffer);
+
       end if;
+
+   end Append;
+
+   procedure Append (Buffer : in out Code_Buffer'Class; F_Buffer : File_Buffer)
+   is
+   begin
+
+      Code_Buffer_V.Append (Buffer.File_Buffer_Vector, F_Buffer);
 
    end Append;
 
@@ -45,12 +61,53 @@ package body T_Buffer is
    is
    begin
 
-      if Buffer.Buffer_V.Is_Empty then
+      if Buffer.Char_Vector.Is_Empty then
          return ' ';
       end if;
 
-      return Buffer.Buffer_V.Last_Element;
+      return Buffer.Char_Vector.Last_Element;
    end Last;
+
+   ---------
+   -- Tag --
+   ---------
+
+   function Tag (Str : String) return Constants.Lex_Type
+   is
+      Prepared_Str : constant String (Str'First .. Str'Last + 2) := Str & "_t";
+   begin
+
+      if Str = ";_t" then
+         return Constants.semi_colon_t;
+      elsif Str = ",_t" then
+         return Constants.colon_t;
+      elsif Str = "._t" then
+         return Constants.dot_t;
+      end if;
+
+      return Constants.Lex_Type'Value (Prepared_Str);
+
+   exception
+
+      when others => return Constants.nil_t;
+
+   end Tag;
+
+   ------------
+   -- Freeze --
+   ------------
+
+   procedure Freeze (Buffer : in out Char_Buffer)
+   is
+      Str_Rep : constant String := Buffer_To_String (Buffer);
+
+   begin
+
+      Buffer.Str := SU.To_Unbounded_String (Str_Rep);
+      Buffer.Kind := Tag (Str_Rep);
+      Buffer.Clear;
+
+   end Freeze;
 
    -----------
    -- Clear --
@@ -60,8 +117,8 @@ package body T_Buffer is
    is
    begin
 
-      Char_Buffer_V.Clear (Buffer.Buffer_V);
-      Char_Buffer_V.Set_Length (Buffer.Buffer_V, 0);
+      Char_Buffer_V.Clear (Buffer.Char_Vector);
+      Char_Buffer_V.Set_Length (Buffer.Char_Vector, 0);
 
    end Clear;
 
@@ -72,15 +129,18 @@ package body T_Buffer is
    function Buffer_To_String (Buffer : Char_Buffer) return String
    is
 
-      Buffer_V : constant Char_Buffer_V.Vector := Buffer.Buffer_V;
+      Char_Vector : constant Char_Buffer_V.Vector := Buffer.Char_Vector;
 
-      Tmp : SU.Unbounded_String :=
-         SU.Null_Unbounded_String;
+      Tmp : SU.Unbounded_String;
 
    begin
 
-      for I in Buffer_V.First_Index .. Buffer_V.Last_Index loop
-         SU.Append (Tmp, Buffer_V (I));
+      if not SU."=" (Buffer.Str, SU.Null_Unbounded_String) then
+         return SU.To_String (Buffer.Str);
+      end if;
+
+      for I in Char_Vector.First_Index .. Char_Vector.Last_Index loop
+         SU.Append (Tmp, Char_Vector (I));
       end loop;
 
       return SU.To_String (Tmp);
@@ -95,26 +155,41 @@ package body T_Buffer is
    is
    begin
 
-      if Buffer.Buffer_V.Length /= 0 then
-         Put_Line (Buffer_To_String (Buffer));
+      if SU."=" (Buffer.Str, SU.Null_Unbounded_String) then
+         Put_Line ("[Warning : Buffer was not freezed]");
+      else
+         Put_Line
+            (Buffer_To_String (Buffer) &
+            " [" &
+            Constants.Lex_Type'Image (Buffer.Kind) &
+            "]");
       end if;
 
    end Print;
 
-   procedure Print (Buffer : File_Buffer.Vector)
+   procedure Print (Buffer : File_Buffer)
    is
 
-      Buffer_Last : constant Positive := Positive (Buffer.Last_Index);
-      First : constant Positive := Positive (Buffer.First_Index) + 1;
-      Last  : constant Positive :=
+      C_Buffers : constant File_Buffer_V.Vector := Buffer.Char_Buffer_Vector;
+      Buffer_Last : constant Natural := Natural (C_Buffers.Last_Index);
+
+      First : constant Natural := Natural (C_Buffers.First_Index);
+      Last  : constant Natural :=
          (if Buffer_Last > 20 then 20 else Buffer_Last);
 
    begin
 
-      Put_Line (Buffer (Buffer.First_Index));
+      if Buffer_Last = 0 then
 
-      for I in First .. Last loop
-         Put_Line (Buffer (I));
+         Put_Line ("File empty");
+         return;
+      end if;
+
+      Print (C_Buffers (First));
+
+      --  Remember, the first element of a File_Buffer is always the file name
+      for I in First + 1 .. Last loop
+         Print (C_Buffers (I));
       end loop;
 
       if Buffer_Last > 20 then
@@ -122,6 +197,16 @@ package body T_Buffer is
       end if;
 
       Put_Line ("");
+
+   end Print;
+
+   procedure Print (Buffer : Code_Buffer)
+   is
+   begin
+
+      for F of Buffer.File_Buffer_Vector loop
+         Print (F);
+      end loop;
 
    end Print;
 

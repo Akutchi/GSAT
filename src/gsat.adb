@@ -10,7 +10,7 @@ procedure Gsat is
 
    V : Expressions.Expr_Visitor;
 
-   Code : T_Buffer.Source_Code.Vector;
+   Code : T_Buffer.Code_Buffer;
 
 begin
 
@@ -24,9 +24,7 @@ begin
 
          Gsat_System.Go_Trough_Level (Src_Path, Code);
 
-         for Code_File of Code loop
-            T_Buffer.Print (Code_File);
-         end loop;
+         T_Buffer.Print (Code);
 
       end;
    end if;

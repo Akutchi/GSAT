@@ -6,6 +6,6 @@ with T_Buffer;
 package Lexer is
 
    function Lexing (F : File_Type; Input : Stream_Access)
-   return T_Buffer.File_Buffer.Vector;
+   return T_Buffer.File_Buffer;
 
 end Lexer;

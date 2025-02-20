@@ -1,0 +1,72 @@
+package Constants is
+
+   type Lex_Type is (
+
+      is_t,
+      begin_t,
+      end_t,
+      procedure_t,
+      function_t,
+      for_t,
+      if_t,
+      while_t,
+      loop_t,
+      type_t,
+      then_t,
+      elsif_t,
+      else_t,
+      record_t,
+      tagged_t,
+      abstract_t,
+      constant_t,
+      in_t,
+      out_t,
+      declare_t,
+      body_t,
+      with_t,
+      use_t,
+      renames_t,
+      package_t,
+      semi_colon_t,
+      colon_t,
+      left_parenthesis_t,
+      right_parenthesis_t,
+      dot_t,
+      nil_t
+   );
+
+   --  Lex_Values : constant array (String) of Lex_Type :=
+   --  (
+   --     "is"           => is_t,
+   --     "begin"        => begin_t,
+   --     "end"          => end_t,
+   --     "procedure"    => procedure_t,
+   --     "function"     => function_t,
+   --     "for"          => for_t,
+   --     "if"           => if_t,
+   --     "while"        => while_t,
+   --     "loop"         => loop_t,
+   --     "type"         => type_t,
+   --     "then"         => then_t,
+   --     "elsif"        => elsif_t,
+   --     "else"         => else_t,
+   --     "record"       => record_t,
+   --     "tagged"       => tagged_t,
+   --     "abstract"     => abstract_t,
+   --     "constant"     => constant_t,
+   --     "in"           => in_t,
+   --     "out"          => out_t,
+   --     "declare"      => declare_t,
+   --     "body"         => body_t,
+   --     "with"         => with_t,
+   --     "use"          => use_t,
+   --     "renames"      => renames_t,
+   --     "package"      => package_t,
+   --     ";"            => semi_colon_t,
+   --     ","            => colon_t,
+   --     "("            => left_parenthesis_t,
+   --     ")"            => right_parenthesis_t,
+   --     "."            => dot_t
+   --  );
+
+end Constants;

@@ -1,49 +1,62 @@
-with Expressions_List;
 with Processing_Utils;
 
 package body Lexer is
 
    function Lexing (F : File_Type; Input : Stream_Access)
-   return T_Buffer.File_Buffer.Vector
+   return T_Buffer.File_Buffer
    is
 
-      Exprs       : Expressions_List.Expr_List.Vector;
-      Buffer      : T_Buffer.Char_Buffer;
-      File_Tokens : T_Buffer.File_Buffer.Vector;
+      File_Tokens : T_Buffer.File_Buffer;
 
       In_Text  : Boolean := False;
       Char     : Character := '$';
+
+      Name_Buffer : T_Buffer.Char_Buffer;
+
    begin
 
-      T_Buffer.Append (File_Tokens, Name (F));
+      Name_Buffer.Append (Name (F));
+      Name_Buffer.Freeze;
+      File_Tokens.Append (Name_Buffer);
 
       while not End_Of_File (F) loop
 
-         loop
+         declare
+            Buffer : T_Buffer.Char_Buffer;
 
-            Character'Read (Input, Char);
+         begin
 
-            Processing_Utils.Toogle (In_Text, Char, Buffer.Last);
+            loop
 
-            exit when Processing_Utils.EOL (Char, In_Text);
+               Character'Read (Input, Char);
 
-            T_Buffer.Append (Buffer, Char);
+               Processing_Utils.Toogle (In_Text, Char, Buffer.Last);
 
-         end loop;
+               exit when Processing_Utils.EOL (Char, In_Text);
 
-         T_Buffer.Append (File_Tokens, T_Buffer.Buffer_To_String (Buffer));
-         Buffer.Clear;
+               Buffer.Append (Char);
 
-         if Processing_Utils.EOL (Char, In_Text) then
+            end loop;
 
-            T_Buffer.Append (Buffer, Char);
-            T_Buffer.Append (File_Tokens, T_Buffer.Buffer_To_String (Buffer));
-            Buffer.Clear;
+            Buffer.Freeze;
+            File_Tokens.Append (Buffer);
 
-         end if;
+            if Processing_Utils.EOL (Char, In_Text) then
 
-         Char := '$';
+               declare
+                  Buffer : T_Buffer.Char_Buffer;
 
+               begin
+                  Buffer.Append (Char);
+                  Buffer.Freeze;
+                  File_Tokens.Append (Buffer);
+
+               end;
+            end if;
+
+            Char := '$';
+
+         end;
       end loop;
 
       return File_Tokens;

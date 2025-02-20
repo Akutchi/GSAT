@@ -1,5 +1,7 @@
 # GSAT - the Gnu Sugar Ada Transpilor
 
+![Logo](./doc/SugarAda_v2.png)
+
 ## Description
 
 This project is a transpilor from Sugar Ada (a custom version of Ada) to Plain Ada.

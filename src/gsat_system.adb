@@ -39,7 +39,6 @@ package body Gsat_System is
                Input := Stream (F);
 
                File_Tokens := Lexer.Lexing (F, Input, Non_Textual_Keywords);
-               T_Buffer.Print (File_Tokens);
                T_Buffer.Append (Code, File_Tokens);
 
             elsif File_Str (File_Str'Last - 1 .. File_Str'Last) /= ".."

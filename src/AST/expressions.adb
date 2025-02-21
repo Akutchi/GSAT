@@ -1,49 +1,50 @@
+with Ada.Text_IO; use Ada.Text_IO;
+
 package body Expressions is
 
-   ----------
-   -- Kind --
-   ----------
+   procedure Parse (Exp : in out Expression'Class; V : in out Visitor) is
+   begin
+      V.Parse (Exp);
+   end Parse;
 
-   function Kind (Self : Expression) return Expr_Type
+   procedure Print (Exp : in out Expression'Class; V : in out Visitor) is
+   begin
+      V.Print (Exp);
+   end Print;
+
+   procedure Parse (V : in out Visitor; Exp : Expression'Class)
    is
    begin
 
-      return Self.Kind_T;
-   end Kind;
+      if Exp.Kind_T = Constants.file_t then
 
-   procedure Visit_File (Self : in out Visitor; Obj : File_Expr'Class)
+         Put_Line ("In file");
+
+      end if;
+   end Parse;
+
+   procedure Print (V : in out Visitor; Exp : Expression'Class)
    is
    begin
 
-      Self.Visit_Expression (Obj);
+      if Exp.Kind_T = Constants.file_t then
 
-   end Visit_File;
+         Put_Line ("In file");
 
-   overriding procedure Visit_File
-      (Self : in out Expr_Visitor; F : File_Expr'Class)
+      end if;
+   end Print;
+
+   function Make (Kind_T : Constants.Lex_Type; Name : SU.Unbounded_String)
+   return File_Expr
    is
-   begin
-         Put_Line ("In " & Ada.Strings.Unbounded.To_String (F.Name));
-
-   end Visit_File;
-
-   procedure Visit (Self : in out Expression; F : File_Type;
-                    V : in out Visitor'Class)
-   is
+      F : File_Expr;
    begin
 
-      V.Visit_Expression (Self);
+      F.Kind_T := Kind_T;
+      F.Name := Name;
 
-   end Visit;
+      return F;
 
-   overriding
-   procedure Visit (Self : in out File_Expr; F : File_Type;
-                    V : in out Visitor'Class)
-   is
-   begin
-
-      null;
-
-   end Visit;
+   end Make;
 
 end Expressions;

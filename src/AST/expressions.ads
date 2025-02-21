@@ -1,58 +1,35 @@
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Ada.Strings.Unbounded;
+
+with Constants; use Constants;
 
 package Expressions is
 
-   type Expr_Type is (P_SPEC, P_BODY, MAIN, IF_TYPE, FUNC_TYPE);
+   package SU renames Ada.Strings.Unbounded;
 
    type Expression is tagged private;
 
-   function Kind (Self : Expression) return Expr_Type;
+   type Visitor is tagged null record;
 
-   overriding
-   function "=" (Left, Right : Expression) return Boolean is
-   (Left.Kind = Right.Kind);
+   procedure Parse (V : in out Visitor; Exp : Expression'Class);
+   procedure Print (V : in out Visitor; Exp : Expression'Class);
 
-   type Visitor is abstract tagged null record;
-
-   procedure Visit (Self : in out Expression; F : File_Type;
-                    V : in out Visitor'Class);
-
-   type Dependency is new Expression with private;
+   procedure Parse (Exp : in out Expression'Class; V : in out Visitor);
+   procedure Print (Exp : in out Expression'Class; V : in out Visitor);
 
    type File_Expr is new Expression with private;
 
-   overriding
-   procedure Visit (Self : in out File_Expr; F : File_Type;
-                    V : in out Visitor'Class);
-
-   procedure Visit_Expression (Self : in out Visitor; Obj : Expression'Class)
-   is null;
-
-   procedure Visit_File (Self : in out Visitor; Obj : File_Expr'Class);
-
-   type Expr_Visitor is new Visitor with null record;
-
-   overriding
-   procedure Visit_File (Self : in out Expr_Visitor; F : File_Expr'Class);
+   function Make (Kind_T : Constants.Lex_Type; Name : SU.Unbounded_String)
+   return File_Expr;
 
 private
 
    type Expression is tagged record
-      Kind_T : Expr_Type;
-   end record;
-
-   type Dependency is new Expression with record
-
-      Lib_Name : Ada.Strings.Unbounded.Unbounded_String;
-      Has_Use : Boolean;
-
+      Kind_T : Constants.Lex_Type;
    end record;
 
    type File_Expr is new Expression with record
 
-      Name : Ada.Strings.Unbounded.Unbounded_String;
+      Name : SU.Unbounded_String;
 
    end record;
 

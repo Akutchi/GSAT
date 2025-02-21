@@ -167,6 +167,35 @@ package body T_Buffer is
 
    end Buffer_To_String;
 
+   function Get (Buffer : File_Buffer'Class; I : Positive) return Char_Buffer
+   is
+   begin
+      return Buffer.Char_Buffer_Vector (I);
+   end Get;
+
+   ---------------
+   -- Get_Files --
+   ---------------
+
+   function Get_Files (Buffer : Code_Buffer) return Code_Buffer_Freezed
+   is
+      N : Positive := Positive (Buffer.File_Buffer_Vector.Length);
+      Code_Freezed : Code_Buffer_Freezed (1 .. N);
+
+      First : Positive := Buffer.File_Buffer_Vector.First_Index;
+      Last  : Positive := Buffer.File_Buffer_Vector.Last_Index;
+
+   begin
+
+      for I in First .. Last loop
+
+         Code_Freezed (I) := Buffer.File_Buffer_Vector (I);
+      end loop;
+
+      return Code_Freezed;
+
+   end Get_Files;
+
    -----------
    -- Print --
    -----------

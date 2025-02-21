@@ -30,12 +30,18 @@ package T_Buffer is
    procedure Append
       (Buffer : in out File_Buffer'Class; C_Buffer : Char_Buffer);
 
+   function Get (Buffer : File_Buffer'Class; I : Positive) return Char_Buffer;
+
    procedure Print (Buffer : File_Buffer);
 
    type Code_Buffer is tagged private;
 
+   type Code_Buffer_Freezed is array (Positive range <>) of File_Buffer;
+
    procedure Append
       (Buffer : in out Code_Buffer'Class; F_Buffer : File_Buffer);
+
+   function Get_Files (Buffer : Code_Buffer) return Code_Buffer_Freezed;
 
    procedure Print (Buffer : Code_Buffer);
 

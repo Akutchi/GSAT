@@ -2,6 +2,8 @@ with Ada.Strings.Unbounded;
 
 with Constants; use Constants;
 
+with T_Buffer;
+
 package Expressions is
 
    package SU renames Ada.Strings.Unbounded;
@@ -10,10 +12,14 @@ package Expressions is
 
    type Visitor is tagged null record;
 
-   procedure Parse (V : in out Visitor; Exp : Expression'Class);
+   procedure Parse (V : in out Visitor; Exp : in out Expression'Class;
+                    Backbone : in out T_Buffer.AST_Backbone);
+
    procedure Print (V : in out Visitor; Exp : Expression'Class);
 
-   procedure Parse (Exp : in out Expression'Class; V : in out Visitor);
+   procedure Parse (Exp : in out Expression'Class; V : in out Visitor;
+                    Backbone : in out T_Buffer.AST_Backbone);
+
    procedure Print (Exp : in out Expression'Class; V : in out Visitor);
 
    type File_Expr is new Expression with private;

@@ -21,6 +21,8 @@ package T_Buffer is
    --  When freezed, the buffer is not writable anymore.
    --  The keyword_map is here to map non textual keyword such as ;
 
+   function Kind (Buffer : Char_Buffer) return Constants.Lex_Type;
+
    function Buffer_To_String (Buffer : Char_Buffer) return String;
 
    procedure Print (Buffer : Char_Buffer);
@@ -44,6 +46,13 @@ package T_Buffer is
    function Get_Files (Buffer : Code_Buffer) return Code_Buffer_Freezed;
 
    procedure Print (Buffer : Code_Buffer);
+
+   type AST_Backbone is record
+
+      File : File_Buffer;
+      Pos  : Positive;
+
+   end record;
 
 private
 

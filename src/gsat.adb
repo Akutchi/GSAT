@@ -1,5 +1,4 @@
 with Ada.Command_Line;
-with Ada.Strings.Unbounded;
 
 with Expressions; use Expressions;
 
@@ -11,7 +10,6 @@ with Constants;
 procedure Gsat is
 
    package CLI renames Ada.Command_Line;
-   package SU renames Ada.Strings.Unbounded;
 
    V : Expressions.Visitor;
 
@@ -37,20 +35,21 @@ begin
 
             declare
 
-               F_Name : constant SU.Unbounded_String :=
-                  SU.To_Unbounded_String
-                     (T_Buffer.Buffer_To_String (File.Get (1)));
+               F : File_Expr;
 
-               F : File_Expr := Make (Constants.file_t, F_Name);
+               Backbone : T_Buffer.AST_Backbone := (File, 1);
 
             begin
 
-               F.Parse (V);
+               F.Parse (V, Backbone);
                Expressions_List.Expr_List.Append (Code_ASTs, F);
 
             end;
          end loop;
 
+         for File_Node of Code_ASTs loop
+            File_Node.Print (V);
+         end loop;
       end;
    end if;
 

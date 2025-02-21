@@ -103,6 +103,19 @@ package body T_Buffer is
 
    end Tag;
 
+   -----------
+   -- Clear --
+   -----------
+
+   procedure Clear (Buffer : in out Char_Buffer)
+   is
+   begin
+
+      Char_Buffer_V.Clear (Buffer.Char_Vector);
+      Char_Buffer_V.Set_Length (Buffer.Char_Vector, 0);
+
+   end Clear;
+
    ------------
    -- Freeze --
    ------------
@@ -129,18 +142,17 @@ package body T_Buffer is
 
    end Freeze;
 
-   -----------
-   -- Clear --
-   -----------
-
-   procedure Clear (Buffer : in out Char_Buffer)
+   function Kind (Buffer : Char_Buffer) return Constants.Lex_Type
    is
    begin
 
-      Char_Buffer_V.Clear (Buffer.Char_Vector);
-      Char_Buffer_V.Set_Length (Buffer.Char_Vector, 0);
+      if SU."=" (Buffer.Str, SU.Null_Unbounded_String) then
+         return Constants.nil_t;
+      end if;
 
-   end Clear;
+      return Buffer.Kind;
+
+   end Kind;
 
    ----------------------
    -- Buffer_To_String --
@@ -179,11 +191,11 @@ package body T_Buffer is
 
    function Get_Files (Buffer : Code_Buffer) return Code_Buffer_Freezed
    is
-      N : Positive := Positive (Buffer.File_Buffer_Vector.Length);
+      N : constant Positive := Positive (Buffer.File_Buffer_Vector.Length);
       Code_Freezed : Code_Buffer_Freezed (1 .. N);
 
-      First : Positive := Buffer.File_Buffer_Vector.First_Index;
-      Last  : Positive := Buffer.File_Buffer_Vector.Last_Index;
+      First : constant Positive := Buffer.File_Buffer_Vector.First_Index;
+      Last  : constant Positive := Buffer.File_Buffer_Vector.Last_Index;
 
    begin
 

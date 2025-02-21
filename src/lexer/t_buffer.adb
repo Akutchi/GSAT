@@ -1,5 +1,8 @@
 with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.Characters.Latin_1;  use Ada.Characters.Latin_1;
+with Ada.Characters.Handling; use Ada.Characters.Handling;
+
+with Processing_Utils;
 
 package body T_Buffer is
 
@@ -72,24 +75,31 @@ package body T_Buffer is
    -- Tag --
    ---------
 
-   function Tag (Str : String) return Constants.Lex_Type
+   function Tag (Str : String; Non_Textual_Keywords : Constants.Keyword.Map)
+   return Constants.Lex_Type
    is
       Prepared_Str : constant String (Str'First .. Str'Last + 2) := Str & "_t";
+      First_Char   : constant Character := Str (Str'First);
+      Is_Edge_Case : Boolean := False;
+
+      Kind : Constants.Lex_Type;
+
    begin
 
-      if Str = ";_t" then
-         return Constants.semi_colon_t;
-      elsif Str = ",_t" then
-         return Constants.colon_t;
-      elsif Str = "._t" then
-         return Constants.dot_t;
+      Kind := Processing_Utils.Lex_Edge_Case (Str, Is_Edge_Case);
+      if Is_Edge_Case then
+         return Kind;
+      end if;
+
+      if not Is_Letter (First_Char) then
+         return Non_Textual_Keywords (Prepared_Str);
       end if;
 
       return Constants.Lex_Type'Value (Prepared_Str);
 
    exception
 
-      when others => return Constants.nil_t;
+      when others => return Constants.identifier_t;
 
    end Tag;
 
@@ -97,15 +107,25 @@ package body T_Buffer is
    -- Freeze --
    ------------
 
-   procedure Freeze (Buffer : in out Char_Buffer)
+   procedure Freeze (Buffer : in out Char_Buffer;
+                     Using : Constants.Keyword.Map)
    is
       Str_Rep : constant String := Buffer_To_String (Buffer);
 
    begin
 
-      Buffer.Str := SU.To_Unbounded_String (Str_Rep);
-      Buffer.Kind := Tag (Str_Rep);
-      Buffer.Clear;
+      if Str_Rep = "" or else Str_Rep = " " then
+
+         Buffer.Str := SU.To_Unbounded_String ("");
+         Buffer.Kind := Constants.nil_t;
+         Buffer.Clear;
+
+      else
+         Buffer.Str := SU.To_Unbounded_String (Str_Rep);
+         Buffer.Kind := Tag (Str_Rep, Non_Textual_Keywords => Using);
+         Buffer.Clear;
+
+      end if;
 
    end Freeze;
 

@@ -3,6 +3,7 @@ with Ada.Command_Line;
 with Expressions;
 with T_Buffer;
 with Gsat_System;
+with Constants;
 
 procedure Gsat is
 
@@ -11,6 +12,8 @@ procedure Gsat is
    V : Expressions.Expr_Visitor;
 
    Code : T_Buffer.Code_Buffer;
+   Non_Textual_Keywords : Constants.Keyword.Map;
+   --  Defined here so that It ought not to be re-Init at each file.
 
 begin
 
@@ -22,9 +25,10 @@ begin
 
       begin
 
-         Gsat_System.Go_Trough_Level (Src_Path, Code);
+         Constants.Init_Map (Non_Textual_Keywords);
+         Gsat_System.Lex_Level (Src_Path, Code, Non_Textual_Keywords);
 
-         T_Buffer.Print (Code);
+         --  T_Buffer.Print (Code);
 
       end;
    end if;

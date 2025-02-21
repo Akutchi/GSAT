@@ -6,8 +6,9 @@ with Lexer;
 
 package body Gsat_System is
 
-   procedure Go_Trough_Level (Dir_Str : String;
-                              Code : in out T_Buffer.Code_Buffer)
+   procedure Lex_Level (Dir_Str : String;
+                        Code : in out T_Buffer.Code_Buffer;
+                        Non_Textual_Keywords : Constants.Keyword.Map)
    is
       Dir : Ada.Directories.Directory_Entry_Type;
       Dir_Search : Ada.Directories.Search_Type;
@@ -37,7 +38,7 @@ package body Gsat_System is
                Open (File => F, Mode => In_File, Name => File_Str);
                Input := Stream (F);
 
-               File_Tokens := Lexer.Lexing (F, Input);
+               File_Tokens := Lexer.Lexing (F, Input, Non_Textual_Keywords);
                T_Buffer.Print (File_Tokens);
                T_Buffer.Append (Code, File_Tokens);
 
@@ -45,7 +46,7 @@ package body Gsat_System is
             and then File_Str (File_Str'Last) /= '.'
             then
 
-               Go_Trough_Level (File_Str, Code);
+               Lex_Level (File_Str, Code, Non_Textual_Keywords);
 
             end if;
 
@@ -55,6 +56,6 @@ package body Gsat_System is
 
       end loop;
 
-   end Go_Trough_Level;
+   end Lex_Level;
 
 end Gsat_System;

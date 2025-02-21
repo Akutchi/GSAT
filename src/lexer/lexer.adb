@@ -2,7 +2,8 @@ with Processing_Utils;
 
 package body Lexer is
 
-   function Lexing (F : File_Type; Input : Stream_Access)
+   function Lexing (F : File_Type; Input : Stream_Access;
+                    Non_Textual_Keywords : Constants.Keyword.Map)
    return T_Buffer.File_Buffer
    is
 
@@ -16,7 +17,7 @@ package body Lexer is
    begin
 
       Name_Buffer.Append (Name (F));
-      Name_Buffer.Freeze;
+      Name_Buffer.Freeze (Using => Non_Textual_Keywords);
       File_Tokens.Append (Name_Buffer);
 
       while not End_Of_File (F) loop
@@ -38,7 +39,7 @@ package body Lexer is
 
             end loop;
 
-            Buffer.Freeze;
+            Buffer.Freeze (Using => Non_Textual_Keywords);
             File_Tokens.Append (Buffer);
 
             if Processing_Utils.EOL (Char, In_Text) then
@@ -48,7 +49,7 @@ package body Lexer is
 
                begin
                   Buffer.Append (Char);
-                  Buffer.Freeze;
+                  Buffer.Freeze (Using => Non_Textual_Keywords);
                   File_Tokens.Append (Buffer);
 
                end;

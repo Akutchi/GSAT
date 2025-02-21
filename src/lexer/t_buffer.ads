@@ -14,10 +14,12 @@ package T_Buffer is
 
    function Last (Buffer : Char_Buffer) return Character;
 
-   procedure Freeze (Buffer : in out Char_Buffer);
+   procedure Freeze (Buffer : in out Char_Buffer;
+                     Using : Constants.Keyword.Map);
    --  Freeze the Char_Vector by transforming it in a string.
    --  Tag the token with the correct lexing category.
-   --  When freezed, the buffer is not writable anymore
+   --  When freezed, the buffer is not writable anymore.
+   --  The keyword_map is here to map non textual keyword such as ;
 
    function Buffer_To_String (Buffer : Char_Buffer) return String;
 
@@ -56,7 +58,8 @@ private
 
    end record;
 
-   function Tag (Str : String) return Constants.Lex_Type;
+   function Tag (Str : String; Non_Textual_Keywords : Constants.Keyword.Map)
+   return Constants.Lex_Type;
 
    procedure Clear (Buffer : in out Char_Buffer);
 

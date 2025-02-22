@@ -20,13 +20,15 @@ package Expressions is
 
    type Visitor is tagged null record;
 
-   procedure Parse (V : in out Visitor; Exp : in out Expression'Class;
-                    Backbone : in out T_Buffer.AST_Backbone);
+   procedure Parse (V         : in out Visitor;
+                    Exp       : in out Expression'Class;
+                    Backbone  : in out T_Buffer.AST_Backbone);
 
    procedure Print (V : in out Visitor; Exp : Expression'Class);
 
-   procedure Parse (Exp : in out Expression'Class; V : in out Visitor;
-                    Backbone : in out T_Buffer.AST_Backbone);
+   procedure Parse (Exp       : in out Expression'Class;
+                    V         : in out Visitor;
+                    Backbone  : in out T_Buffer.AST_Backbone);
 
    procedure Print (Exp : Expression'Class; V : in out Visitor);
 
@@ -86,5 +88,25 @@ private
       Container      : Container_Expr;
 
    end record;
+
+   procedure Get_Until_Semicolon (Str      : in out SU.Unbounded_String;
+                                  Backbone : in out T_Buffer.AST_Backbone);
+
+   procedure Parse_Dependency (Exp        : in out Expression'Class;
+                               Backbone   : in out T_Buffer.AST_Backbone);
+
+   procedure Parse_Package (V         : in out Visitor;
+                            Exp       : in out Expression'Class;
+                            Backbone  : in out T_Buffer.AST_Backbone);
+
+   procedure Parse_File (V          : in out Visitor;
+                         Exp        : in out Expression'Class;
+                         Backbone   : in out T_Buffer.AST_Backbone);
+
+   procedure Print_With (Exp : Dependency_Expr);
+
+   procedure Print_Package (Exp : Container_Expr);
+
+   procedure Print_File (Exp : File_Expr; V : in out Visitor'Class);
 
 end Expressions;

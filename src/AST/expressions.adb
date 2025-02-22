@@ -42,6 +42,7 @@ package body Expressions is
       Current_Token := Backbone.Next;
       if Current_Token.Kind = Constants.use_t then
 
+         Current_Token := Backbone.Next;
          Get_Until_Semicolon (Use_Str, Backbone);
 
       end if;
@@ -233,7 +234,7 @@ package body Expressions is
 
    exception
 
-      when Constraint_Error => Put_Line ("Rest of the file");
+      when Constraint_Error => Put_Line ("[UNKNOWN]");
 
    end Print;
 

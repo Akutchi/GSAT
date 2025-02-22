@@ -6,7 +6,7 @@ package body Expressions is
    -- Get_Until_Semicolon --
    -------------------------
 
-   procedure Get_Until_Semicolon (Str : in out SU.Unbounded_String;
+   procedure Get_Until_Semicolon (Str      : in out SU.Unbounded_String;
                                   Backbone : in out T_Buffer.AST_Backbone)
    is
       Current_Token : T_Buffer.Char_Buffer;
@@ -28,7 +28,7 @@ package body Expressions is
    -- Parse_Dependency --
    ----------------------
 
-   procedure Parse_Dependency (Exp : in out Expression'Class;
+   procedure Parse_Dependency (Exp     : in out Expression'Class;
                               Backbone : in out T_Buffer.AST_Backbone)
    is
       Current_Token : T_Buffer.Char_Buffer;
@@ -42,6 +42,7 @@ package body Expressions is
       Current_Token := Backbone.Next;
       if Current_Token.Kind = Constants.use_t then
 
+         Current_Token := Backbone.Next;
          Get_Until_Semicolon (Use_Str, Backbone);
 
       end if;
@@ -52,9 +53,9 @@ package body Expressions is
 
    end Parse_Dependency;
 
-   procedure Parse_Package (V : in out Visitor;
-                             Exp : in out Expression'Class;
-                             Backbone : in out T_Buffer.AST_Backbone)
+   procedure Parse_Package (V          : in out Visitor;
+                             Exp       : in out Expression'Class;
+                             Backbone  : in out T_Buffer.AST_Backbone)
    is
       Name           : SU.Unbounded_String;
       Has_Body       : Boolean := False;
@@ -89,9 +90,9 @@ package body Expressions is
    -- Parse_File --
    ----------------
 
-   procedure Parse_File (V : in out Visitor;
-                         Exp : in out Expression'Class;
-                         Backbone : in out T_Buffer.AST_Backbone)
+   procedure Parse_File (V          : in out Visitor;
+                         Exp        : in out Expression'Class;
+                         Backbone   : in out T_Buffer.AST_Backbone)
    is
       F_Name         : SU.Unbounded_String;
       Dependencies   : Expr_List.Vector := Expr_List.Empty_Vector;
@@ -130,8 +131,9 @@ package body Expressions is
    -- Parse --
    -----------
 
-   procedure Parse (V : in out Visitor; Exp : in out Expression'Class;
-                    Backbone : in out T_Buffer.AST_Backbone)
+   procedure Parse (V         : in out Visitor;
+                    Exp       : in out Expression'Class;
+                    Backbone  : in out T_Buffer.AST_Backbone)
    is
       Current_Token : constant T_Buffer.Char_Buffer := Backbone.Current;
 
@@ -148,8 +150,9 @@ package body Expressions is
       end case;
    end Parse;
 
-   procedure Parse (Exp : in out Expression'Class; V : in out Visitor;
-                    Backbone : in out T_Buffer.AST_Backbone)
+   procedure Parse (Exp       : in out Expression'Class;
+                    V         : in out Visitor;
+                    Backbone  : in out T_Buffer.AST_Backbone)
    is
    begin
       V.Parse (Exp, Backbone);
@@ -175,6 +178,10 @@ package body Expressions is
 
    end Print_With;
 
+   -------------------
+   -- Print_Package --
+   -------------------
+
    procedure Print_Package (Exp : Container_Expr)
    is
    begin
@@ -197,7 +204,7 @@ package body Expressions is
    -- Print_File --
    ----------------
 
-   procedure Print_File (Exp : File_Expr; V : in out Visitor)
+   procedure Print_File (Exp : File_Expr; V : in out Visitor'Class)
    is
    begin
       Put_Line (SU.To_String (Exp.File_Name));

@@ -2,7 +2,6 @@ with Ada.Command_Line;
 
 with Expressions; use Expressions;
 
-with Expressions_List;
 with T_Buffer;
 with Gsat_System;
 with Constants;
@@ -16,7 +15,8 @@ procedure Gsat is
    Code_Tokens : T_Buffer.Code_Buffer;
    Non_Textual_Keywords : Constants.Keyword.Map;
    --  Defined here so that It ought not to be re-Init at each file.
-   Code_ASTs : Expressions_List.Expr_List.Vector;
+
+   Code_ASTs : Expr_List.Vector;
 
 begin
 
@@ -35,14 +35,14 @@ begin
 
             declare
 
-               F : File_Expr;
-
+               F        : File_Expr;
                Backbone : T_Buffer.AST_Backbone := (File, 1);
 
             begin
 
+               F := F.Make (Constants.file_t);
                F.Parse (V, Backbone);
-               Expressions_List.Expr_List.Append (Code_ASTs, F);
+               Expr_List.Append (Code_ASTs, F);
 
             end;
          end loop;

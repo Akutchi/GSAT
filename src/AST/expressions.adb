@@ -6,15 +6,84 @@ package body Expressions is
    -- Parse --
    -----------
 
-   procedure Parse_File (Exp : in out Expression'Class;
-                         Backbone : T_Buffer.AST_Backbone)
+   procedure Parse_Dependency (Exp : in out Expression'Class;
+                              Backbone : in out T_Buffer.AST_Backbone)
    is
-      F_Name : constant SU.Unbounded_String :=
-                  SU.To_Unbounded_String
-                     (T_Buffer.Buffer_To_String (Backbone.File.Get (1)));
+      Current_Token : T_Buffer.Char_Buffer;
+
+      With_Str, Use_Str : SU.Unbounded_String := SU.Null_Unbounded_String;
+
    begin
 
-      Exp := File_Expr'Class (Make (Constants.file_t, F_Name));
+      Backbone.Pos := Backbone.Pos + 1;
+      Current_Token := Backbone.File.Get (Backbone.Pos);
+
+      while Current_Token.Kind /= Constants.semi_colon_t loop
+
+         SU.Append
+            (With_Str,
+             Backbone.File.Get (Backbone.Pos).Buffer_To_String);
+
+         Backbone.Pos := Backbone.Pos + 1;
+         Current_Token := Backbone.File.Get (Backbone.Pos);
+
+      end loop;
+
+      Backbone.Pos := Backbone.Pos + 1;
+      Current_Token := Backbone.File.Get (Backbone.Pos);
+
+      if Current_Token.Kind = Constants.use_t then
+
+         while Current_Token.Kind /= Constants.semi_colon_t loop
+
+            SU.Append
+               (Use_Str,
+                Backbone.File.Get (Backbone.Pos).Buffer_To_String);
+
+            Backbone.Pos := Backbone.Pos + 1;
+            Current_Token := Backbone.File.Get (Backbone.Pos);
+
+         end loop;
+
+      end if;
+
+      Exp := Expression'Class (Dependency_Expr (Exp).Make (Constants.with_t,
+                                                           With_Str,
+                                                           Use_Str));
+
+   end Parse_Dependency;
+
+   procedure Parse_File (V : in out Visitor;
+                         Exp : in out Expression'Class;
+                         Backbone : in out T_Buffer.AST_Backbone)
+   is
+      F_Name         : SU.Unbounded_String;
+      Dependencies   : Expr_List.Vector := Expr_List.Empty_Vector;
+
+      Current_Token : T_Buffer.Char_Buffer;
+
+   begin
+
+      F_Name := SU.To_Unbounded_String
+                     (T_Buffer.Buffer_To_String (Backbone.File.Get (1)));
+
+      Backbone.Pos := Backbone.Pos + 1;
+      Current_Token := Backbone.File.Get (Backbone.Pos);
+      while Current_Token.Kind = Constants.with_t loop
+
+         declare
+            D : Dependency_Expr;
+         begin
+
+            D.Parse (V, Backbone);
+            Dependencies.Append (D);
+            Current_Token := Backbone.File.Get (Backbone.Pos);
+
+         end;
+      end loop;
+
+      Exp := Expression'Class
+         (File_Expr (Exp).Make (Dependencies, F_Name));
 
    end Parse_File;
 
@@ -23,13 +92,13 @@ package body Expressions is
    is
       Current_Token : constant T_Buffer.Char_Buffer :=
          Backbone.File.Get (Backbone.Pos);
+
    begin
 
       case Current_Token.Kind is
 
-         when Constants.file_t =>
-            Parse_File (Exp, Backbone);
-            Backbone.Pos := Backbone.Pos + 1;
+         when Constants.file_t => Parse_File (V, Exp, Backbone);
+         when Constants.with_t => Parse_Dependency (Exp, Backbone);
 
          when others => null;
 
@@ -47,10 +116,33 @@ package body Expressions is
    -- Print --
    -----------
 
-   procedure Print_File (Exp : File_Expr)
+   procedure Print_With (Exp : Dependency_Expr)
+   is
+   begin
+
+      if not SU."=" (Exp.With_Str, SU.Null_Unbounded_String) then
+         Put ("with " & SU.To_String (Exp.With_Str) & "; ");
+      end if;
+
+      if not SU."=" (Exp.Use_Str, SU.Null_Unbounded_String) then
+         Put_Line ("use " & SU.To_String (Exp.Use_Str) & "; ");
+      end if;
+
+      Put_Line ("");
+
+   end Print_With;
+
+   procedure Print_File (Exp : File_Expr; V : in out Visitor)
    is
    begin
       Put_Line (SU.To_String (Exp.Name));
+
+      for Dependency of Exp.Dependencies loop
+         Dependency.Print (V);
+      end loop;
+
+      Put_Line ("");
+
    end Print_File;
 
    procedure Print (V : in out Visitor; Exp : Expression'Class)
@@ -59,19 +151,19 @@ package body Expressions is
 
       if Exp.Kind_T = Constants.file_t then
 
-         Print_File (File_Expr (Exp));
+         Print_File (File_Expr (Exp), V);
 
       end if;
 
       if Exp.Kind_T = Constants.with_t then
 
-         Put_Line ("with");
+         Print_With (Dependency_Expr (Exp));
 
       end if;
 
    end Print;
 
-   procedure Print (Exp : in out Expression'Class; V : in out Visitor)
+   procedure Print (Exp : Expression'Class; V : in out Visitor)
    is
    begin
       V.Print (Exp);
@@ -81,16 +173,44 @@ package body Expressions is
    -- Make --
    ----------
 
-   function Make (Kind_T : Constants.Lex_Type; Name : SU.Unbounded_String)
+   function Make (F              : File_Expr;
+                  Kind_T         : Constants.Lex_Type)
    return File_Expr
    is
-      F : File_Expr;
+      F_New : File_Expr;
    begin
 
-      F.Kind_T := Kind_T;
-      F.Name := Name;
+      F_New.Kind_T := Kind_T;
 
-      return F;
+      return F_New;
+
+   end Make;
+
+   function Make (F              : File_Expr;
+                  Dependencies   : Expr_List.Vector;
+                  Name           : SU.Unbounded_String)
+   return File_Expr
+   is
+      F_New : File_Expr;
+   begin
+
+      F_New.Kind_T := F.Kind_T;
+      F_New.Dependencies := Dependencies;
+      F_New.Name   := Name;
+
+      return F_New;
+
+   end Make;
+
+   function Make
+      (D                   : Dependency_Expr;
+       Kind_T              : Constants.Lex_Type;
+       With_Str, Use_Str   : SU.Unbounded_String := SU.Null_Unbounded_String)
+   return Dependency_Expr
+   is
+   begin
+
+      return (Kind_T, With_Str, Use_Str);
 
    end Make;
 

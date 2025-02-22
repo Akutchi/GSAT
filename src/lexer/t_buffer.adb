@@ -142,6 +142,10 @@ package body T_Buffer is
 
    end Freeze;
 
+   ----------
+   -- Kind --
+   ----------
+
    function Kind (Buffer : Char_Buffer) return Constants.Lex_Type
    is
    begin
@@ -179,6 +183,10 @@ package body T_Buffer is
 
    end Buffer_To_String;
 
+   ---------
+   -- Get --
+   ---------
+
    function Get (Buffer : File_Buffer'Class; I : Positive) return Char_Buffer
    is
    begin
@@ -207,6 +215,39 @@ package body T_Buffer is
       return Code_Freezed;
 
    end Get_Files;
+
+   function Make (File : File_Buffer'Class; Pos : Positive) return AST_Backbone
+   is
+   begin
+
+      return (File_Buffer (File), Pos);
+
+   end Make;
+
+   -------------
+   -- Current --
+   -------------
+
+   function Current (Backbone : AST_Backbone'Class) return Char_Buffer
+   is
+   begin
+
+      return Backbone.File.Get (Backbone.Pos);
+
+   end Current;
+
+   ----------
+   -- Next --
+   ----------
+
+   function Next (Backbone : in out AST_Backbone'Class) return Char_Buffer
+   is
+   begin
+
+      Backbone.Pos := Backbone.Pos + 1;
+      return Backbone.File.Get (Backbone.Pos);
+
+   end Next;
 
    -----------
    -- Print --

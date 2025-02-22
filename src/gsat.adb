@@ -36,7 +36,7 @@ begin
             declare
 
                F        : File_Expr;
-               Backbone : T_Buffer.AST_Backbone := (File, 1);
+               Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File, 1);
 
             begin
 

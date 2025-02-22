@@ -38,6 +38,8 @@ package T_Buffer is
 
    type Code_Buffer is tagged private;
 
+   --  This allows me to get a Code_Buffer without needing to expose
+   --  The vector package.
    type Code_Buffer_Freezed is array (Positive range <>) of File_Buffer;
 
    procedure Append
@@ -47,12 +49,14 @@ package T_Buffer is
 
    procedure Print (Buffer : Code_Buffer);
 
-   type AST_Backbone is record
+   type AST_Backbone is tagged private;
 
-      File : File_Buffer;
-      Pos  : Positive;
+   function Make (File : File_Buffer'Class; Pos : Positive)
+   return AST_Backbone;
 
-   end record;
+   function Current (Backbone : AST_Backbone'Class) return Char_Buffer;
+
+   function Next (Backbone : in out AST_Backbone'Class) return Char_Buffer;
 
 private
 
@@ -102,6 +106,13 @@ private
    type Code_Buffer is tagged record
 
       File_Buffer_Vector : Code_Buffer_V.Vector;
+
+   end record;
+
+   type AST_Backbone is tagged record
+
+      File : File_Buffer;
+      Pos  : Positive;
 
    end record;
 

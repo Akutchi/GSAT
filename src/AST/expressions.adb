@@ -15,22 +15,19 @@ package body Expressions is
 
    begin
 
-      Backbone.Pos := Backbone.Pos + 1;
-      Current_Token := Backbone.File.Get (Backbone.Pos);
+      Current_Token := Backbone.Next;
 
       while Current_Token.Kind /= Constants.semi_colon_t loop
 
          SU.Append
             (With_Str,
-             Backbone.File.Get (Backbone.Pos).Buffer_To_String);
+             Backbone.Current.Buffer_To_String);
 
-         Backbone.Pos := Backbone.Pos + 1;
-         Current_Token := Backbone.File.Get (Backbone.Pos);
+         Current_Token := Backbone.Next;
 
       end loop;
 
-      Backbone.Pos := Backbone.Pos + 1;
-      Current_Token := Backbone.File.Get (Backbone.Pos);
+      Current_Token := Backbone.Next;
 
       if Current_Token.Kind = Constants.use_t then
 
@@ -38,10 +35,9 @@ package body Expressions is
 
             SU.Append
                (Use_Str,
-                Backbone.File.Get (Backbone.Pos).Buffer_To_String);
+                Backbone.Current.Buffer_To_String);
 
-            Backbone.Pos := Backbone.Pos + 1;
-            Current_Token := Backbone.File.Get (Backbone.Pos);
+            Current_Token := Backbone.Next;
 
          end loop;
 
@@ -64,11 +60,10 @@ package body Expressions is
 
    begin
 
-      F_Name := SU.To_Unbounded_String
-                     (T_Buffer.Buffer_To_String (Backbone.File.Get (1)));
+      F_Name := SU.To_Unbounded_String (T_Buffer.Buffer_To_String
+                                                         (Backbone.Current));
 
-      Backbone.Pos := Backbone.Pos + 1;
-      Current_Token := Backbone.File.Get (Backbone.Pos);
+      Current_Token := Backbone.Next;
       while Current_Token.Kind = Constants.with_t loop
 
          declare
@@ -77,7 +72,7 @@ package body Expressions is
 
             D.Parse (V, Backbone);
             Dependencies.Append (D);
-            Current_Token := Backbone.File.Get (Backbone.Pos);
+            Current_Token := Backbone.Current;
 
          end;
       end loop;
@@ -90,8 +85,7 @@ package body Expressions is
    procedure Parse (V : in out Visitor; Exp : in out Expression'Class;
                     Backbone : in out T_Buffer.AST_Backbone)
    is
-      Current_Token : constant T_Buffer.Char_Buffer :=
-         Backbone.File.Get (Backbone.Pos);
+      Current_Token : constant T_Buffer.Char_Buffer := Backbone.Current;
 
    begin
 

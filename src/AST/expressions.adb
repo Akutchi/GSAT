@@ -6,40 +6,39 @@ package body Expressions is
    -- Parse --
    -----------
 
+   procedure Get_Until_Semicolon (Str : in out SU.Unbounded_String;
+                                  Backbone : in out T_Buffer.AST_Backbone)
+   is
+      Current_Token : T_Buffer.Char_Buffer;
+
+   begin
+
+      Current_Token := Backbone.Current;
+
+      while Current_Token.Kind /= Constants.semi_colon_t loop
+
+         SU.Append (Str, Backbone.Current.Buffer_To_String);
+         Current_Token := Backbone.Next;
+
+      end loop;
+
+   end Get_Until_Semicolon;
+
    procedure Parse_Dependency (Exp : in out Expression'Class;
                               Backbone : in out T_Buffer.AST_Backbone)
    is
       Current_Token : T_Buffer.Char_Buffer;
-
       With_Str, Use_Str : SU.Unbounded_String := SU.Null_Unbounded_String;
 
    begin
 
       Current_Token := Backbone.Next;
-
-      while Current_Token.Kind /= Constants.semi_colon_t loop
-
-         SU.Append
-            (With_Str,
-             Backbone.Current.Buffer_To_String);
-
-         Current_Token := Backbone.Next;
-
-      end loop;
+      Get_Until_Semicolon (With_Str, Backbone);
 
       Current_Token := Backbone.Next;
-
       if Current_Token.Kind = Constants.use_t then
 
-         while Current_Token.Kind /= Constants.semi_colon_t loop
-
-            SU.Append
-               (Use_Str,
-                Backbone.Current.Buffer_To_String);
-
-            Current_Token := Backbone.Next;
-
-         end loop;
+         Get_Until_Semicolon (Use_Str, Backbone);
 
       end if;
 

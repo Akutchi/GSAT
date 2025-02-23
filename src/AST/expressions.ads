@@ -18,19 +18,10 @@ package Expressions is
       Element_Type => Expression'Class,
       "="          => "=");
 
-   type Visitor is tagged null record;
-
-   procedure Parse (V         : in out Visitor;
-                    Exp       : in out Expression'Class;
-                    Backbone  : in out T_Buffer.AST_Backbone);
-
-   procedure Print (V : in out Visitor; Exp : Expression'Class);
-
    procedure Parse (Exp       : in out Expression'Class;
-                    V         : in out Visitor;
                     Backbone  : in out T_Buffer.AST_Backbone);
 
-   procedure Print (Exp : Expression'Class; V : in out Visitor);
+   procedure Print (Exp : Expression'Class);
 
    type Dependency_Expr is new Expression with private;
 
@@ -95,18 +86,16 @@ private
    procedure Parse_Dependency (Exp        : in out Expression'Class;
                                Backbone   : in out T_Buffer.AST_Backbone);
 
-   procedure Parse_Package (V         : in out Visitor;
-                            Exp       : in out Expression'Class;
+   procedure Parse_Package (Exp       : in out Expression'Class;
                             Backbone  : in out T_Buffer.AST_Backbone);
 
-   procedure Parse_File (V          : in out Visitor;
-                         Exp        : in out Expression'Class;
+   procedure Parse_File (Exp        : in out Expression'Class;
                          Backbone   : in out T_Buffer.AST_Backbone);
 
    procedure Print_With (Exp : Dependency_Expr);
 
    procedure Print_Package (Exp : Container_Expr);
 
-   procedure Print_File (Exp : File_Expr; V : in out Visitor'Class);
+   procedure Print_File (Exp : File_Expr);
 
 end Expressions;

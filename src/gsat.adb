@@ -10,8 +10,6 @@ procedure Gsat is
 
    package CLI renames Ada.Command_Line;
 
-   V : Expressions.Visitor;
-
    Code_Tokens : T_Buffer.Code_Buffer;
    Non_Textual_Keywords : Constants.Keyword.Map;
    --  Defined here so that It ought not to be re-Init at each file.
@@ -41,14 +39,14 @@ begin
             begin
 
                F := F.Make (Constants.file_t);
-               F.Parse (V, Backbone);
+               F.Parse (Backbone);
                Expr_List.Append (Code_ASTs, F);
 
             end;
          end loop;
 
          for File_Node of Code_ASTs loop
-            File_Node.Print (V);
+            File_Node.Print;
          end loop;
       end;
    end if;

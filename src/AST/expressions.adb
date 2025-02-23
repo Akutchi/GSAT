@@ -53,9 +53,8 @@ package body Expressions is
 
    end Parse_Dependency;
 
-   procedure Parse_Package (V          : in out Visitor;
-                             Exp       : in out Expression'Class;
-                             Backbone  : in out T_Buffer.AST_Backbone)
+   procedure Parse_Package (Exp       : in out Expression'Class;
+                            Backbone  : in out T_Buffer.AST_Backbone)
    is
       Name           : SU.Unbounded_String;
       Has_Body       : Boolean := False;
@@ -90,8 +89,7 @@ package body Expressions is
    -- Parse_File --
    ----------------
 
-   procedure Parse_File (V          : in out Visitor;
-                         Exp        : in out Expression'Class;
+   procedure Parse_File (Exp        : in out Expression'Class;
                          Backbone   : in out T_Buffer.AST_Backbone)
    is
       F_Name         : SU.Unbounded_String;
@@ -112,14 +110,14 @@ package body Expressions is
             D : Dependency_Expr;
          begin
 
-            D.Parse (V, Backbone);
+            D.Parse (Backbone);
             Dependencies.Append (D);
             Current_Token := Backbone.Current;
 
          end;
       end loop;
 
-      Container.Parse (V, Backbone);
+      Container.Parse (Backbone);
 
       Exp := Expression'Class (File_Expr (Exp).Make (F_Name,
                                                      Dependencies,
@@ -131,8 +129,7 @@ package body Expressions is
    -- Parse --
    -----------
 
-   procedure Parse (V         : in out Visitor;
-                    Exp       : in out Expression'Class;
+   procedure Parse (Exp       : in out Expression'Class;
                     Backbone  : in out T_Buffer.AST_Backbone)
    is
       Current_Token : constant T_Buffer.Char_Buffer := Backbone.Current;
@@ -141,21 +138,13 @@ package body Expressions is
 
       case Current_Token.Kind is
 
-         when Constants.file_t    => Parse_File (V, Exp, Backbone);
+         when Constants.file_t    => Parse_File (Exp, Backbone);
          when Constants.with_t    => Parse_Dependency (Exp, Backbone);
-         when Constants.package_t => Parse_Package (V, Exp, Backbone);
+         when Constants.package_t => Parse_Package (Exp, Backbone);
 
          when others => null;
 
       end case;
-   end Parse;
-
-   procedure Parse (Exp       : in out Expression'Class;
-                    V         : in out Visitor;
-                    Backbone  : in out T_Buffer.AST_Backbone)
-   is
-   begin
-      V.Parse (Exp, Backbone);
    end Parse;
 
    ----------------
@@ -204,17 +193,17 @@ package body Expressions is
    -- Print_File --
    ----------------
 
-   procedure Print_File (Exp : File_Expr; V : in out Visitor'Class)
+   procedure Print_File (Exp : File_Expr)
    is
    begin
       Put_Line (SU.To_String (Exp.File_Name));
 
       for Dependency of Exp.Dependencies loop
-         Dependency.Print (V);
+         Dependency.Print;
       end loop;
 
       Put_Line (" ");
-      Exp.Container.Print (V);
+      Exp.Container.Print;
       Put_Line (" ");
 
    end Print_File;
@@ -223,13 +212,13 @@ package body Expressions is
    -- Print --
    -----------
 
-   procedure Print (V : in out Visitor; Exp : Expression'Class)
+   procedure Print (Exp : Expression'Class)
    is
    begin
 
       case Exp.Kind_T is
 
-         when Constants.file_t      => Print_File (File_Expr (Exp), V);
+         when Constants.file_t      => Print_File (File_Expr (Exp));
          when Constants.with_t      => Print_With (Dependency_Expr (Exp));
          when Constants.package_t   => Print_Package (Container_Expr (Exp));
 
@@ -242,12 +231,6 @@ package body Expressions is
 
       when Constraint_Error => Put_Line ("[UNKNOWN]");
 
-   end Print;
-
-   procedure Print (Exp : Expression'Class; V : in out Visitor)
-   is
-   begin
-      V.Print (Exp);
    end Print;
 
    ----------

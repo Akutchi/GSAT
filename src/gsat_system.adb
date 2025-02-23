@@ -1,9 +1,8 @@
 with Ada.Text_IO;                use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams;   use Ada.Text_IO.Text_Streams;
 
+with Ada.Strings.Unbounded;
 with Ada.Direct_IO;
-with Ada.Strings.Fixed;
-with Ada.Strings.Maps;
 
 with GNAT.SHA1;
 
@@ -11,8 +10,7 @@ with Lexer;
 
 package body Gsat_System is
 
-   package S_F renames Ada.Strings.Fixed;
-   package S_M renames Ada.Strings.Maps;
+   package SU renames Ada.Strings.Unbounded;
 
    ---------------------------------
    -- Create_Generation_Directory --
@@ -26,22 +24,17 @@ package body Gsat_System is
 
    end Create_Generation_Directory;
 
-   ----------------------
-   -- Create_Signature --
-   ----------------------
+   ------------------------
+   -- Generate_Signature --
+   ------------------------
 
-   procedure Create_Signature (Dir : Ada.Directories.Directory_Entry_Type)
+   function Generate_Signature (Dir : Ada.Directories.Directory_Entry_Type)
+   return Signature
    is
-      Sgt_File    : Ada.Text_IO.File_Type;
 
       Absolute_Name  : constant String := Ada.Directories.Full_Name (Dir);
-      Name_Ext       : constant String := Ada.Directories.Simple_Name (Dir);
-      Name           : constant String := Ada.Directories.Base_Name (Name_Ext);
-
       File_Size      : constant Natural := Natural (Ada.Directories.Size
                                                       (Absolute_Name));
-
-      Sgt_File_Str : constant String := "./obj/gen/" & Name & ".sgt";
 
       subtype File_String is String (1 .. File_Size);
       package FS_IO is new Ada.Direct_IO (File_String);
@@ -55,51 +48,127 @@ package body Gsat_System is
 
       FS_IO.Open (Base_File, FS_IO.In_File, Absolute_Name);
       FS_IO.Read (Base_File, Content);
+      FS_IO.Close (Base_File);
       GNAT.SHA1.Update (Ctx, Content);
 
-      if Ada.Directories.Extension (Name_Ext) = "ads" then
+      return Signature'(GNAT.SHA1.Digest (Ctx));
 
-         if Ada.Directories.Exists (Sgt_File_Str) then
+   end Generate_Signature;
 
-            Ada.Text_IO.Open (Sgt_File, Ada.Text_IO.In_File, Sgt_File_Str);
-            Skip_Line (Sgt_File);
-            declare
-               Line_adb : String := Get_Line (Sgt_File);
-            begin
-               Close (Sgt_File);
-               Ada.Text_IO.Open (Sgt_File, Ada.Text_IO.Out_File, Sgt_File_Str);
-               Put_Line (Sgt_File, Name_Ext & " " & GNAT.SHA1.Digest (Ctx));
-               Put (Sgt_File, Line_adb);
-            end;
+   ---------------------------------------
+   -- Get_Extension_From_Signature_File --
+   ---------------------------------------
 
-         else
+   function Get_Extension_From_Signature_File (Sgt_Str : String) return String
+   is
+      Str_Last : constant Integer := Integer (Sgt_Str'Last);
+      Sgt_Last : constant Integer := Integer (Signature'Last);
 
-            Ada.Text_IO.Create
-               (Sgt_File, Ada.Text_IO.Append_File, Sgt_File_Str);
-            Put (Sgt_File, Name_Ext & " " & GNAT.SHA1.Digest (Ctx));
+   begin
 
-         end if;
-
-      elsif Ada.Directories.Extension (Name_Ext) = "adb" then
-
-         if Ada.Directories.Exists (Sgt_File_Str) then
-
-            Ada.Text_IO.Open (Sgt_File, Ada.Text_IO.Append_File, Sgt_File_Str);
-            Put (Sgt_File, Name_Ext & " " & GNAT.SHA1.Digest (Ctx));
-
-         else
-
-            Ada.Text_IO.Create (Sgt_File, Ada.Text_IO.Out_File, Sgt_File_Str);
-            New_Line (Sgt_File, 1);
-            Put (Sgt_File, Name_Ext & " " & GNAT.SHA1.Digest (Ctx));
-
-         end if;
+      if Str_Last - Sgt_Last < 0 then
+         return "";
       end if;
 
-      FS_IO.Close (Base_File);
-      Ada.Text_IO.Close (Sgt_File);
+      return Sgt_Str (Str_Last - Sgt_Last - 3 .. Str_Last - Sgt_Last - 1);
 
-   end Create_Signature;
+   end Get_Extension_From_Signature_File;
+
+   ----------------------------
+   -- Prepare_Signature_File --
+   ----------------------------
+
+   procedure Prepare_Signature_File
+      (Dir : Ada.Directories.Directory_Entry_Type)
+   is
+
+      Sgt_File : Ada.Text_IO.File_Type;
+
+      Name_Ext     : constant String := Ada.Directories.Simple_Name (Dir);
+      Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
+      Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
+
+      Existing_Sgt, File_Ext  : SU.Unbounded_String;
+      Another_Sgt             : constant Signature := Generate_Signature (Dir);
+
+   begin
+
+      if Ada.Directories.Exists (Sgt_File_Str) then
+
+         Open (Sgt_File, In_File, Sgt_File_Str);
+         Existing_Sgt   := SU.To_Unbounded_String (Get_Line (Sgt_File));
+         File_Ext       := SU.To_Unbounded_String
+                           (Get_Extension_From_Signature_File
+                              (SU.To_String (Existing_Sgt)));
+         Close (Sgt_File);
+
+         Open (Sgt_File, Out_File, Sgt_File_Str);
+
+         if SU.To_String (File_Ext) = "ads" then
+            Put_Line (Sgt_File, SU.To_String (Existing_Sgt));
+            Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
+
+         elsif SU.To_String (File_Ext) = "adb" then
+            Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
+            Put_Line (Sgt_File, SU.To_String (Existing_Sgt));
+         end if;
+
+         Close (Sgt_File);
+
+      else
+
+         Create (Sgt_File, Out_File, Sgt_File_Str);
+         Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
+         Close (Sgt_File);
+
+      end if;
+
+   end Prepare_Signature_File;
+
+   -------------------------
+   -- String_To_Signature --
+   -------------------------
+
+   function String_To_Signature (Str : String) return Signature
+   is
+      Sgt   : Signature;
+      Start : constant Integer := Str'Last - Signature'Last;
+
+   begin
+
+      if Start < 0 then
+         return Empty_Signature;
+      end if;
+
+      for I in Signature'Range loop
+         Sgt (I) := Str (Start + I);
+      end loop;
+
+      return Sgt;
+
+   end String_To_Signature;
+
+   -------------------------
+   -- Get_Number_Of_Lines --
+   -------------------------
+
+   function Get_Number_Of_Lines (F_Str : String) return Natural
+   is
+      Lines : Natural := 0;
+      F     : File_Type;
+   begin
+
+      Open (F, In_File, F_Str);
+      while not End_Of_File (F) loop
+
+         Lines := Lines + 1;
+         Skip_Line (F);
+      end loop;
+      Close (F);
+
+      return Lines;
+
+   end Get_Number_Of_Lines;
 
    -------------------
    -- Get_Signature --
@@ -108,9 +177,48 @@ package body Gsat_System is
    function Get_Signature (Dir : Ada.Directories.Directory_Entry_Type)
    return Signature
    is
+      F : Ada.Text_IO.File_Type;
+
+      Name_Ext     : constant String := Ada.Directories.Simple_Name (Dir);
+      Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
+      Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
+
+      Lines : Natural;
+
    begin
 
+      Lines := Get_Number_Of_Lines (Sgt_File_Str);
+      Open (F, In_File, Sgt_File_Str);
+
+      loop
+
+         declare
+            Sgt_Str : constant String := Get_Line (F);
+            File_Ext : constant String :=
+               Get_Extension_From_Signature_File (Sgt_Str);
+         begin
+
+            if Extension (Name_Ext) = File_Ext then
+
+               Close (F);
+               return String_To_Signature (Sgt_Str);
+
+            end if;
+         end;
+
+         Lines := Lines - 1;
+         exit when Lines = 0;
+
+      end loop;
+
+      Close (F);
+
       return Empty_Signature;
+
+   exception
+
+      when Ada.Text_IO.Name_Error | Ada.Text_IO.End_Error =>
+            return Empty_Signature;
 
    end Get_Signature;
 
@@ -118,14 +226,22 @@ package body Gsat_System is
    -- Has_Signature_Changed --
    ---------------------------
 
-   function Has_Signature_Changed (Dir : Ada.Directories.Directory_Entry_Type;
-                                   Current_Sgt : Signature)
+   function Has_Signature_Changed
+      (Dir         : Ada.Directories.Directory_Entry_Type;
+       Current_Sgt : Signature;
+       New_Sgt     : in out Signature)
    return Status
    is
    begin
 
       if Current_Sgt = Empty_Signature then
          return NOT_EXIST;
+      end if;
+
+      New_Sgt := Generate_Signature (Dir);
+
+      if Current_Sgt = New_Sgt then
+         return SAME;
       end if;
 
       return CHANGED;
@@ -136,11 +252,59 @@ package body Gsat_System is
    -- Update_Signature --
    ----------------------
 
-   procedure Update_Signature (Dir : Ada.Directories.Directory_Entry_Type;
-                               Current_Sgt : Signature)
+   procedure Update_Signature (Dir     : Ada.Directories.Directory_Entry_Type;
+                               New_Sgt : Signature)
    is
+      F : Ada.Text_IO.File_Type;
+
+      Name_Ext     : constant String := Ada.Directories.Simple_Name (Dir);
+      Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
+      Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
+
+      Lines : Natural;
+
    begin
-      null;
+
+      Lines := Get_Number_Of_Lines (Sgt_File_Str);
+
+      if Lines = 1 then
+         Open (F, Out_File, Sgt_File_Str);
+         Put (F, Name_Ext & " " & String (String_To_Signature (New_Sgt)));
+         Close (F);
+
+      else
+
+         Open (F, In_File, Sgt_File_Str);
+         declare
+            Ads_Sgt_Str : constant String := Get_Line (F);
+            Adb_Sgt_Str : constant String := Get_Line (F);
+
+         begin
+
+            Close (F);
+            Open (F, Out_File, Sgt_File_Str);
+
+            if Extension (Name_Ext) = "ads" then
+
+               Put_Line (F,
+                        Name_Ext &
+                        " " &
+                        String (String_To_Signature (New_Sgt)));
+
+               Put (F, Adb_Sgt_Str);
+
+            elsif Extension (Name_Ext) = "adb" then
+
+               Put_Line (F, Ads_Sgt_Str);
+               Put (F,
+                  Name_Ext &
+                  " " &
+                  String (String_To_Signature (New_Sgt)));
+
+            end if;
+         end;
+      end if;
+
    end Update_Signature;
 
    ---------
@@ -163,17 +327,19 @@ package body Gsat_System is
       Put_Line (Standard_Output, "  [SugarAda]    " &
                                  Ada.Directories.Simple_Name (Dir));
 
-      Open (File => F, Mode => In_File, Name => File_Str);
+      Open (F, In_File, File_Str);
       Input := Stream (F);
 
       File_Tokens := Lexer.Lexing (F, Input, Non_Textual_Keywords);
       T_Buffer.Append (Code, File_Tokens);
 
+      Close (F);
+
    end Lex;
 
-   ---------------------
-   -- Is_Not_Relative --
-   ---------------------
+   --------------------------
+   -- Is_Not_Relative_Path --
+   --------------------------
 
    function Is_Not_Relative_Path (Dir : Ada.Directories.Directory_Entry_Type)
    return Boolean
@@ -212,21 +378,21 @@ package body Gsat_System is
 
             File_Str : constant String := Ada.Directories.Full_Name (Dir);
 
-            Sgt         : Signature;
-            Sgt_Status  : Status;
+            Sgt, New_Sgt   : Signature := Empty_Signature;
+            Sgt_Status     : Status;
 
          begin
 
             if Ada.Directories.Kind (Dir) = Ada.Directories.Ordinary_File then
 
                Sgt         := Get_Signature (Dir);
-               Sgt_Status  := Has_Signature_Changed (Dir, Sgt);
+               Sgt_Status  := Has_Signature_Changed (Dir, Sgt, New_Sgt);
+
                case Sgt_Status is
 
                   when SAME      => null;
-                  when CHANGED   => Update_Signature (Dir, Sgt);
-                  when NOT_EXIST => Create_Signature (Dir);
-
+                  when CHANGED   => Update_Signature (Dir, New_Sgt);
+                  when NOT_EXIST => Prepare_Signature_File (Dir);
                end case;
 
                if Sgt_Status /= SAME then

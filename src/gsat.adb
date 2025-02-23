@@ -1,3 +1,5 @@
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Ada.Command_Line;
 
 with Expressions; use Expressions;
@@ -26,7 +28,10 @@ begin
 
       begin
 
+         Gsat_System.Create_Generation_Directory;
          Constants.Init_Map (Non_Textual_Keywords);
+
+         Put_Line (Standard_Output, "Transpile");
          Gsat_System.Lex_Level (Src_Path, Code_Tokens, Non_Textual_Keywords);
 
          for File of Code_Tokens.Get_Files loop
@@ -45,9 +50,9 @@ begin
             end;
          end loop;
 
-         for File_Node of Code_ASTs loop
-            File_Node.Print;
-         end loop;
+         --  for File_Node of Code_ASTs loop
+         --     File_Node.Print;
+         --  end loop;
       end;
    end if;
 

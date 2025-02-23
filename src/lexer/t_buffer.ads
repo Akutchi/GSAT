@@ -40,7 +40,7 @@ package T_Buffer is
 
    --  This allows me to get a Code_Buffer without needing to expose
    --  The vector package.
-   type Code_Buffer_Freezed is array (Natural range <>) of File_Buffer;
+   type Code_Buffer_Freezed is array (Positive range <>) of File_Buffer;
 
    procedure Append
       (Buffer : in out Code_Buffer'Class; F_Buffer : File_Buffer);

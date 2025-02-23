@@ -1,6 +1,7 @@
 with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.Characters.Latin_1;  use Ada.Characters.Latin_1;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Containers;          use Ada.Containers;
 
 with Processing_Utils;
 
@@ -199,22 +200,34 @@ package body T_Buffer is
 
    function Get_Files (Buffer : Code_Buffer) return Code_Buffer_Freezed
    is
-      N : constant Positive := Positive (Buffer.File_Buffer_Vector.Length);
-      Code_Freezed : Code_Buffer_Freezed (1 .. N);
-
-      First : constant Positive := Buffer.File_Buffer_Vector.First_Index;
-      Last  : constant Positive := Buffer.File_Buffer_Vector.Last_Index;
-
    begin
 
-      for I in First .. Last loop
+      if Buffer.File_Buffer_Vector.Length = 0 then
+         raise Constraint_Error;
+      end if;
 
-         Code_Freezed (I) := Buffer.File_Buffer_Vector (I);
-      end loop;
+      declare
+         N : constant Positive := Positive (Buffer.File_Buffer_Vector.Length);
+         Code_Freezed : Code_Buffer_Freezed (1 .. N);
 
-      return Code_Freezed;
+         First : constant Positive := Buffer.File_Buffer_Vector.First_Index;
+         Last  : constant Positive := Buffer.File_Buffer_Vector.Last_Index;
+      begin
+
+         for I in First .. Last loop
+
+            Code_Freezed (I) := Buffer.File_Buffer_Vector (I);
+         end loop;
+
+         return Code_Freezed;
+
+      end;
 
    end Get_Files;
+
+   ----------
+   -- Make --
+   ----------
 
    function Make (File : File_Buffer'Class; Pos : Positive) return AST_Backbone
    is

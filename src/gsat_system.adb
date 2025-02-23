@@ -95,6 +95,12 @@ package body Gsat_System is
 
       if Ada.Directories.Exists (Sgt_File_Str) then
 
+         --  This absolute monster of conversion is necessary, because,
+         --  for one reason or another, if I try to insert a declare
+         --  clause after the Open to directly get the Signature line
+         --  from a Get_Line, I then have a use_error :
+         --  reopening shared file
+
          Open (Sgt_File, In_File, Sgt_File_Str);
          Existing_Sgt   := SU.To_Unbounded_String (Get_Line (Sgt_File));
          File_Ext       := SU.To_Unbounded_String
@@ -104,14 +110,22 @@ package body Gsat_System is
 
          Open (Sgt_File, Out_File, Sgt_File_Str);
 
-         if SU.To_String (File_Ext) = "ads" then
-            Put_Line (Sgt_File, SU.To_String (Existing_Sgt));
-            Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
+         declare
 
-         elsif SU.To_String (File_Ext) = "adb" then
-            Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
-            Put_Line (Sgt_File, SU.To_String (Existing_Sgt));
-         end if;
+            File_Ext_Str      : constant String := SU.To_String (File_Ext);
+            Existing_Sgt_Str  : constant String := SU.To_String (Existing_Sgt);
+
+         begin
+
+            if File_Ext_Str = "ads" then
+               Put_Line (Sgt_File, Existing_Sgt_Str);
+               Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
+
+            elsif File_Ext_Str = "adb" then
+               Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
+               Put_Line (Sgt_File, Existing_Sgt_Str);
+            end if;
+         end;
 
          Close (Sgt_File);
 

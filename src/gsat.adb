@@ -23,7 +23,6 @@ begin
    if CLI.Argument_Count > 0 then
 
       declare
-
          Src_Path : constant String := CLI.Argument (1);
 
       begin
@@ -34,26 +33,38 @@ begin
          Put_Line (Standard_Output, "Transpile");
          Gsat_System.Lex_Level (Src_Path, Code_Tokens, Non_Textual_Keywords);
 
-         for File of Code_Tokens.Get_Files loop
+         declare
+            Code_Freezed : constant T_Buffer.Code_Buffer_Freezed :=
+                                                         Code_Tokens.Get_Files;
+         begin
 
-            declare
+            for File of Code_Freezed loop
 
-               F        : File_Expr;
-               Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File, 1);
+               declare
 
-            begin
+                  F        : File_Expr;
+                  Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File,
+                                                                     1);
+               begin
 
-               F := F.Make (Constants.file_t);
-               F.Parse (Backbone);
-               Expr_List.Append (Code_ASTs, F);
+                  F := F.Make (Constants.file_t);
+                  F.Parse (Backbone);
+                  Expr_List.Append (Code_ASTs, F);
 
-            end;
-         end loop;
+               end;
+            end loop;
 
-         --  for File_Node of Code_ASTs loop
-         --     File_Node.Print;
-         --  end loop;
+            --  for File_Node of Code_ASTs loop
+            --     File_Node.Print;
+            --  end loop;
+         end;
       end;
    end if;
+
+exception
+
+   when Constraint_Error => null;
+   --  When Code_Tokens.Get_File raise such an error because there is no new
+   --  file to lex/parse.
 
 end Gsat;

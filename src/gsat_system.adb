@@ -20,7 +20,8 @@ package body Gsat_System is
    is
    begin
 
-      Ada.Directories.Create_Path ("./obj/gen");
+      Ada.Directories.Create_Path (Constants.Generation_Folder);
+      Ada.Directories.Create_Path (Constants.Generation_Src_Folder);
 
    end Create_Generation_Directory;
 
@@ -88,54 +89,43 @@ package body Gsat_System is
       Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
       Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
 
-      Existing_Sgt, File_Ext  : SU.Unbounded_String;
-      Another_Sgt             : constant Signature := Generate_Signature (Dir);
+      Another_Sgt  : constant Signature := Generate_Signature (Dir);
 
    begin
 
       if Ada.Directories.Exists (Sgt_File_Str) then
 
-         --  This absolute monster of conversion is necessary, because,
-         --  for one reason or another, if I try to insert a declare
-         --  clause after the Open to directly get the Signature line
-         --  from a Get_Line, I then have a use_error :
-         --  reopening shared file
-
          Open (Sgt_File, In_File, Sgt_File_Str);
-         Existing_Sgt   := SU.To_Unbounded_String (Get_Line (Sgt_File));
-         File_Ext       := SU.To_Unbounded_String
-                           (Get_Extension_From_Signature_File
-                              (SU.To_String (Existing_Sgt)));
-         Close (Sgt_File);
-
-         Open (Sgt_File, Out_File, Sgt_File_Str);
 
          declare
-
-            File_Ext_Str      : constant String := SU.To_String (File_Ext);
-            Existing_Sgt_Str  : constant String := SU.To_String (Existing_Sgt);
+            Existing_Sgt : constant String := Get_Line (Sgt_File);
+            File_Ext     : constant String :=
+            Get_Extension_From_Signature_File (Existing_Sgt);
 
          begin
 
-            if File_Ext_Str = "ads" then
-               Put_Line (Sgt_File, Existing_Sgt_Str);
+            Close (Sgt_File);
+            Open (Sgt_File, Out_File, Sgt_File_Str);
+
+            if File_Ext = "ads" then
+               Put_Line (Sgt_File, Existing_Sgt);
                Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
 
-            elsif File_Ext_Str = "adb" then
+            elsif File_Ext = "adb" then
                Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
-               Put_Line (Sgt_File, Existing_Sgt_Str);
+               Put_Line (Sgt_File, Existing_Sgt);
             end if;
-         end;
 
-         Close (Sgt_File);
+         end;
 
       else
 
          Create (Sgt_File, Out_File, Sgt_File_Str);
          Put_Line (Sgt_File, Name_Ext & " " & Another_Sgt);
-         Close (Sgt_File);
 
       end if;
+
+      Close (Sgt_File);
 
    end Prepare_Signature_File;
 
@@ -284,7 +274,6 @@ package body Gsat_System is
       if Lines = 1 then
          Open (F, Out_File, Sgt_File_Str);
          Put (F, Name_Ext & " " & String (String_To_Signature (New_Sgt)));
-         Close (F);
 
       else
 
@@ -318,6 +307,8 @@ package body Gsat_System is
             end if;
          end;
       end if;
+
+      Close (F);
 
    end Update_Signature;
 

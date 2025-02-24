@@ -3,6 +3,9 @@ with Ada.Strings.Hash;
 
 package Constants is
 
+   Generation_Folder       : constant String := "./obj/gen";
+   Generation_Src_Folder   : constant String := "./obj/gen/src";
+
    type Lex_Type is (
 
       with_t,        --  package

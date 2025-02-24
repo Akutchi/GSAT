@@ -1,7 +1,6 @@
 with Ada.Text_IO;                use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams;   use Ada.Text_IO.Text_Streams;
 
-with Ada.Strings.Unbounded;
 with Ada.Direct_IO;
 
 with GNAT.SHA1;
@@ -9,8 +8,6 @@ with GNAT.SHA1;
 with Lexer;
 
 package body Gsat_System is
-
-   package SU renames Ada.Strings.Unbounded;
 
    ---------------------------------
    -- Create_Generation_Directory --
@@ -87,7 +84,8 @@ package body Gsat_System is
 
       Name_Ext     : constant String := Ada.Directories.Simple_Name (Dir);
       Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
-      Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
+      Sgt_File_Str : constant String := Constants.Generation_Folder &
+                                        Just_Name & ".sgt";
 
       Another_Sgt  : constant Signature := Generate_Signature (Dir);
 
@@ -172,6 +170,10 @@ package body Gsat_System is
 
       return Lines;
 
+   exception
+
+      when Ada.Text_IO.Name_Error => return 0;
+
    end Get_Number_Of_Lines;
 
    -------------------
@@ -185,7 +187,8 @@ package body Gsat_System is
 
       Name_Ext     : constant String := Ada.Directories.Simple_Name (Dir);
       Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
-      Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
+      Sgt_File_Str : constant String := Constants.Generation_Folder &
+                                        Just_Name & ".sgt";
 
       Lines : Natural;
 
@@ -263,7 +266,8 @@ package body Gsat_System is
 
       Name_Ext     : constant String := Ada.Directories.Simple_Name (Dir);
       Just_Name    : constant String := Ada.Directories.Base_Name (Name_Ext);
-      Sgt_File_Str : constant String := "./obj/gen/" & Just_Name & ".sgt";
+      Sgt_File_Str : constant String := Constants.Generation_Folder &
+                                        Just_Name & ".sgt";
 
       Lines : Natural;
 

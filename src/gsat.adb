@@ -2,11 +2,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Ada.Command_Line;
 
-with Expressions; use Expressions;
+with Expressions.File; use Expressions.File;
 
 with T_Buffer;
 with Gsat_System;
 with Constants;
+
+with Visitor_Interface.Visitor;
 
 procedure Gsat is
 
@@ -16,7 +18,8 @@ procedure Gsat is
    Non_Textual_Keywords : Constants.Keyword.Map;
    --  Defined here so that It ought not to be re-Init at each file.
 
-   Code_ASTs : Expr_List.Vector;
+   V_Parse : Visitor_Interface.Visitor.Visitor_Parse;
+   V_Print : Visitor_Interface.Visitor.Visitor_Print;
 
 begin
 
@@ -38,20 +41,24 @@ begin
 
             declare
 
-               F_Expr   : File_Expr;
-               Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File,
-                                                                  1);
+               F_Expr : File_Expr;
+
+               Backbone : constant T_Buffer.AST_Backbone :=
+               T_Buffer.Make (File, 1);
+
             begin
 
-               F_Expr := F_Expr.Make (Constants.file_t);
-               F_Expr.Parse (Backbone);
-               Expr_List.Append (Code_ASTs, F_Expr);
+               F_Expr            := F_Expr.Make (Constants.file_t);
+               V_Parse.F         := F_Expr;
+               V_Parse.Backbone  := Backbone;
+
+               File.Accept_v (V_Parse);
+
+               V_Print.AST := V_Parse.F;
+
+               File.Accept_v (V_Print, F);
 
             end;
-         end loop;
-
-         for File_Node of Code_ASTs loop
-            File_Node.Print (F);
          end loop;
       end;
    end if;

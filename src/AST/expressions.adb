@@ -1,5 +1,3 @@
-with Ada.Text_IO; use Ada.Text_IO;
-
 package body Expressions is
 
    -------------------------
@@ -151,19 +149,19 @@ package body Expressions is
    -- Print_With --
    ----------------
 
-   procedure Print_With (Exp : Dependency_Expr)
+   procedure Print_With (Exp : Dependency_Expr; F : in out File_Type)
    is
    begin
 
       if not SU."=" (Exp.With_Str, SU.Null_Unbounded_String) then
-         Put ("with " & SU.To_String (Exp.With_Str) & "; ");
+         Put (F, "with " & SU.To_String (Exp.With_Str) & "; ");
       end if;
 
       if not SU."=" (Exp.Use_Str, SU.Null_Unbounded_String) then
-         Put_Line ("use " & SU.To_String (Exp.Use_Str) & "; ");
+         Put_Line (F, "use " & SU.To_String (Exp.Use_Str) & "; ");
       end if;
 
-      Put_Line ("");
+      Put_Line (F, "");
 
    end Print_With;
 
@@ -171,21 +169,19 @@ package body Expressions is
    -- Print_Package --
    -------------------
 
-   procedure Print_Package (Exp : Container_Expr)
+   procedure Print_Package (Exp : Container_Expr; F : in out File_Type)
    is
    begin
 
-      Put ("package ");
+      Put (F, "package ");
 
       if Exp.Has_Body then
-         Put ("body ");
+         Put (F, "body ");
       end if;
 
-      Put_Line (SU.To_String (Exp.Name));
-      Put_Line ("is");
-      Put_Line ("begin");
+      Put_Line (F, SU.To_String (Exp.Name) & " is");
 
-      Put_Line ("end " & SU.To_String (Exp.Name) & ";");
+      Put_Line (F, "end " & SU.To_String (Exp.Name) & ";");
 
    end Print_Package;
 
@@ -193,18 +189,33 @@ package body Expressions is
    -- Print_File --
    ----------------
 
-   procedure Print_File (Exp : File_Expr)
+   procedure Print_File (Exp : File_Expr; F : in out File_Type)
    is
-   begin
-      Put_Line (SU.To_String (Exp.File_Name));
+      F_Name         : SU.Unbounded_String;
+      Absolute_Name  : constant String := SU.To_String (Exp.File_Name);
 
-      for Dependency of Exp.Dependencies loop
-         Dependency.Print;
+   begin
+
+      for I in reverse Absolute_Name'Range loop
+
+         exit when Absolute_Name (I) = '/';
+         F_Name := SU."&" (Absolute_Name (I), F_Name);
+
       end loop;
 
-      Put_Line (" ");
-      Exp.Container.Print;
-      Put_Line (" ");
+      Create (F,
+              Out_File,
+              Constants.Generation_Src_Folder & SU.To_String (F_Name));
+
+      for Dependency of Exp.Dependencies loop
+         Dependency.Print (F);
+      end loop;
+
+      Put_Line (F, " ");
+      Exp.Container.Print (F);
+      Put_Line (F, " ");
+
+      Close (F);
 
    end Print_File;
 
@@ -212,15 +223,15 @@ package body Expressions is
    -- Print --
    -----------
 
-   procedure Print (Exp : Expression'Class)
+   procedure Print (Exp : Expression'Class; F : in out File_Type)
    is
    begin
 
       case Exp.Kind_T is
 
-         when Constants.file_t      => Print_File (File_Expr (Exp));
-         when Constants.with_t      => Print_With (Dependency_Expr (Exp));
-         when Constants.package_t   => Print_Package (Container_Expr (Exp));
+         when Constants.file_t      => Print_File (File_Expr (Exp), F);
+         when Constants.with_t      => Print_With (Dependency_Expr (Exp), F);
+         when Constants.package_t   => Print_Package (Container_Expr (Exp), F);
 
          when others => Put_Line ("Could not print " &
                                   Constants.Lex_Type'Image (Exp.Kind_T));
@@ -229,7 +240,7 @@ package body Expressions is
 
    exception
 
-      when Constraint_Error => Put_Line ("[UNKNOWN]");
+      when Constraint_Error => Put_Line (F, "--  [UNKNOWN]");
 
    end Print;
 

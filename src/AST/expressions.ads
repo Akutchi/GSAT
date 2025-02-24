@@ -1,3 +1,5 @@
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Ada.Strings.Unbounded;
 with Ada.Containers.Indefinite_Vectors;
 
@@ -21,7 +23,7 @@ package Expressions is
    procedure Parse (Exp       : in out Expression'Class;
                     Backbone  : in out T_Buffer.AST_Backbone);
 
-   procedure Print (Exp : Expression'Class);
+   procedure Print (Exp : Expression'Class; F : in out File_Type);
 
    type Dependency_Expr is new Expression with private;
 
@@ -92,10 +94,10 @@ private
    procedure Parse_File (Exp        : in out Expression'Class;
                          Backbone   : in out T_Buffer.AST_Backbone);
 
-   procedure Print_With (Exp : Dependency_Expr);
+   procedure Print_With (Exp : Dependency_Expr; F : in out File_Type);
 
-   procedure Print_Package (Exp : Container_Expr);
+   procedure Print_Package (Exp : Container_Expr; F : in out File_Type);
 
-   procedure Print_File (Exp : File_Expr);
+   procedure Print_File (Exp : File_Expr; F : in out File_Type);
 
 end Expressions;

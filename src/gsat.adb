@@ -24,6 +24,7 @@ begin
 
       declare
          Src_Path : constant String := CLI.Argument (1);
+         F        : File_Type;
 
       begin
 
@@ -33,31 +34,25 @@ begin
          Put_Line (Standard_Output, "Transpile");
          Gsat_System.Lex_Level (Src_Path, Code_Tokens, Non_Textual_Keywords);
 
-         declare
-            Code_Freezed : constant T_Buffer.Code_Buffer_Freezed :=
-                                                         Code_Tokens.Get_Files;
-         begin
+         for File of Code_Tokens.Get_Files loop
 
-            for File of Code_Freezed loop
+            declare
 
-               declare
+               F_Expr   : File_Expr;
+               Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File,
+                                                                  1);
+            begin
 
-                  F        : File_Expr;
-                  Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File,
-                                                                     1);
-               begin
+               F_Expr := F_Expr.Make (Constants.file_t);
+               F_Expr.Parse (Backbone);
+               Expr_List.Append (Code_ASTs, F_Expr);
 
-                  F := F.Make (Constants.file_t);
-                  F.Parse (Backbone);
-                  Expr_List.Append (Code_ASTs, F);
+            end;
+         end loop;
 
-               end;
-            end loop;
-
-            --  for File_Node of Code_ASTs loop
-            --     File_Node.Print;
-            --  end loop;
-         end;
+         for File_Node of Code_ASTs loop
+            File_Node.Print (F);
+         end loop;
       end;
    end if;
 

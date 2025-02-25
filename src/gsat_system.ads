@@ -5,6 +5,12 @@ with Constants;
 
 package Gsat_System is
 
+   procedure Show_Grey_Text (Str : String);
+
+   procedure Show_Duration (Prog_Duration : Duration);
+
+   function Parse_Src (Arg : String) return String;
+
    procedure Create_Generation_Directory;
 
    procedure Lex_Level

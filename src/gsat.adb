@@ -1,8 +1,11 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;             use Ada.Text_IO;
+with Ada.Exceptions;          use Ada.Exceptions;
+with Ada.Calendar;            use Ada.Calendar;
 
 with Ada.Command_Line;
 
-with Expressions.File; use Expressions.File;
+with Expressions.File;     use Expressions.File;
+with Exceptions.Arguments; use Exceptions.Arguments;
 
 with T_Buffer;
 with Gsat_System;
@@ -26,15 +29,22 @@ begin
    if CLI.Argument_Count > 0 then
 
       declare
-         Src_Path : constant String := CLI.Argument (1);
+         Src_Path : constant String :=
+            Gsat_System.Parse_Src (CLI.Argument (1));
+
          F        : File_Type;
+
+         Start_Time  : Time;
+         End_Time    : Time;
 
       begin
 
          Gsat_System.Create_Generation_Directory;
          Constants.Init_Map (Non_Textual_Keywords);
 
-         Put_Line (Standard_Output, "Transpile");
+         Start_Time := Clock;
+
+         Gsat_System.Show_Grey_Text ("Transpile");
          Gsat_System.Lex_Level (Src_Path, Code_Tokens, Non_Textual_Keywords);
 
          for File of Code_Tokens.Get_Files loop
@@ -54,7 +64,15 @@ begin
 
             end;
          end loop;
+
+         delay 2.0;
+
+         End_Time := Clock;
+         Gsat_System.Show_Duration (End_Time - Start_Time);
       end;
+
+   else
+      Gsat_System.Show_Grey_Text ("Nothing to transpile, abort.");
    end if;
 
 exception
@@ -62,5 +80,8 @@ exception
    when Constraint_Error => null;
    --  When Code_Tokens.Get_File raise such an error because there is no new
    --  file to lex/parse.
+
+   when E : Argument_Option_Error | Argument_Name_Error =>
+   Put_Line (Exception_Message (E));
 
 end Gsat;

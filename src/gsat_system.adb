@@ -1,13 +1,79 @@
 with Ada.Text_IO;                use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams;   use Ada.Text_IO.Text_Streams;
+with Ada.Characters.Latin_1;     use Ada.Characters.Latin_1;
+with Ada.Strings.Fixed;          use Ada.Strings.Fixed;
 
 with Ada.Direct_IO;
 
 with GNAT.SHA1;
 
+with Exceptions.Arguments; use Exceptions.Arguments;
+
 with Lexer;
 
 package body Gsat_System is
+
+   --------------------
+   -- Show_Grey_Text --
+   --------------------
+
+   procedure Show_Grey_Text (Str : String)
+   is
+   begin
+      Put_Line (ESC & "[90m" & Str & ESC & "[0m");
+   end Show_Grey_Text;
+
+   -------------------
+   -- Show_Duration --
+   -------------------
+
+   procedure Show_Duration (Prog_Duration : Duration)
+   is
+      Duration_Str   : constant String := Duration'Image (Prog_Duration);
+      First          : constant Natural := Duration_Str'First;
+      Point_Pos      : constant Natural := Index (Duration_Str,
+                                                  ".",
+                                                  Duration_Str'First);
+      Two_Commas     : constant Natural := Point_Pos + 2;
+
+   begin
+
+      Put_Line ("Transpiling finished successfully in" & ESC & "[1m" &
+                Duration_Str (First .. Two_Commas) & " " & ESC & "[0m" &
+                "seconds.");
+
+   end Show_Duration; --  f
+
+   ---------------
+   -- Parse_Src --
+   ---------------
+
+   function Parse_Src (Arg : String) return String
+   is
+      Command_Name  : constant String := Arg (Arg'First .. Arg'First + 1);
+      Src_Candidate : constant String := Arg (Arg'First + 3 .. Arg'Last);
+
+   begin
+
+      if Arg (Arg'First + 2) /= '=' then
+         raise Argument_Option_Error with
+         "No option was specified for the source folder";
+      end if;
+
+      if Command_Name /= "-s" then
+         raise Argument_Option_Error with
+         Command_Name & " is not reckognized as an option.";
+      end if;
+
+      if not Exists (Src_Candidate) then
+         raise Argument_Name_Error with
+         Src_Candidate & " is not a valid source folder.";
+
+      end if;
+
+      return Src_Candidate;
+
+   end Parse_Src;
 
    ---------------------------------
    -- Create_Generation_Directory --
@@ -333,8 +399,7 @@ package body Gsat_System is
 
    begin
 
-      Put_Line (Standard_Output, "  [SugarAda]    " &
-                                 Ada.Directories.Simple_Name (Dir));
+      Show_Grey_Text ("  [SugarAda]    " & Ada.Directories.Simple_Name (Dir));
 
       Open (F, In_File, File_Str);
       Input := Stream (F);

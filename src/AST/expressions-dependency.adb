@@ -59,7 +59,7 @@ package body Expressions.Dependency is
                        F      : in out File_Type)
    is
    begin
-      V.Visit_Dependency (Expr, F);
+      V.Visit_Expr (Expr, F);
    end Accept_v;
 
    -------------------------

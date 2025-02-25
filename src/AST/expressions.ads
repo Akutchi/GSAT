@@ -25,22 +25,12 @@ package Expressions is
                        F      : in out File_Type)
    is abstract;
 
-   procedure Visit_File (V : in out Visitor_Int)
+   procedure Visit_Expr (V : in out Visitor_Int)
    is abstract;
 
-   procedure Visit_File (V    : Visitor_Int;
+   procedure Visit_Expr (V    : Visitor_Int;
                          Expr : Expression'Class;
                          File : in out File_Type)
-   is abstract;
-
-   procedure Visit_Dependency (V    : Visitor_Int;
-                               Expr : Expression'Class;
-                               File : in out File_Type)
-   is abstract;
-
-   procedure Visit_Container (V    : Visitor_Int;
-                              Expr : Expression'Class;
-                              File : in out File_Type)
    is abstract;
 
    package Expr_List is new Ada.Containers.Indefinite_Vectors

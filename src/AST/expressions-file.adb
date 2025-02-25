@@ -95,7 +95,7 @@ package body Expressions.File is
                        F      : in out File_Type)
    is
    begin
-      V.Visit_File (Expr, F);
+      V.Visit_Expr (Expr, F);
    end Accept_v;
 
    ----------------

@@ -66,7 +66,7 @@ package body Expressions.Container is
                        F      : in out File_Type)
    is
    begin
-      V.Visit_Container (Expr, F);
+      V.Visit_Expr (Expr, F);
    end Accept_v;
 
    -------------------

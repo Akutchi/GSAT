@@ -22,24 +22,12 @@ package Visitor is
    end record;
 
    overriding
-   procedure Visit_File (V : in out Visitor_Parse);
+   procedure Visit_Expr (V : in out Visitor_Parse);
 
    overriding
-   procedure Visit_File (V    : Visitor_Parse;
+   procedure Visit_Expr (V    : Visitor_Parse;
                          Expr : Expression'Class;
                          File : in out File_Type)
-   is null;
-
-   overriding
-   procedure Visit_Dependency (V    : Visitor_Parse;
-                               Expr : Expression'Class;
-                               File : in out File_Type)
-   is null;
-
-   overriding
-   procedure Visit_Container (V    : Visitor_Parse;
-                              Expr : Expression'Class;
-                              File : in out File_Type)
    is null;
 
    -----------
@@ -49,21 +37,11 @@ package Visitor is
    type Visitor_Print is new Visitor_Int with null record;
 
    overriding
-   procedure Visit_File (V : in out Visitor_Print) is null;
+   procedure Visit_Expr (V : in out Visitor_Print) is null;
 
    overriding
-   procedure Visit_File (V    : Visitor_Print;
+   procedure Visit_Expr (V    : Visitor_Print;
                          Expr : Expression'Class;
                          File : in out File_Type);
-
-   overriding
-   procedure Visit_Dependency (V    : Visitor_Print;
-                               Expr : Expression'Class;
-                               File : in out File_Type);
-
-   overriding
-   procedure Visit_Container (V    : Visitor_Print;
-                              Expr : Expression'Class;
-                              File : in out File_Type);
 
 end Visitor;

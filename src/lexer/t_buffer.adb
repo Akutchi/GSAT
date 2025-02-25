@@ -197,7 +197,7 @@ package body T_Buffer is
    procedure Accept_v (F : File_Buffer; V : in out Visitor_Int'Class)
    is
    begin
-      Visit_File (V);
+      Visit_Expr (V);
    end Accept_v;
 
    ---------------

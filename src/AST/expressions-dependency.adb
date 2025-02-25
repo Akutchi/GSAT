@@ -16,15 +16,56 @@ package body Expressions.Dependency is
 
    end Make;
 
+   -------------------------
+   -- Get_Until_Semicolon --
+   -------------------------
+
+   procedure Get_Until_Semicolon
+      (Str      : in out SU.Unbounded_String;
+       Backbone : in out T_Buffer.AST_Backbone'Class)
+   is
+      Current_Token : T_Buffer.Char_Buffer;
+
+   begin
+
+      Current_Token := Backbone.Current;
+
+      while Current_Token.Kind /= Constants.semi_colon_t loop
+
+         SU.Append (Str, Backbone.Current.Buffer_To_String);
+         Current_Token := Backbone.Next;
+
+      end loop;
+
+   end Get_Until_Semicolon;
+
    -----------
    -- Parse --
    -----------
 
-   procedure Parse (D          : in out Dependency_Expr;
-                    Backbone   : in out T_Buffer.AST_Backbone'Class)
+   overriding
+   procedure Parse (Expr   : in out Dependency_Expr;
+                 V         : Visitor_Int'Class;
+                 Backbone  : in out T_Buffer.AST_Backbone'Class)
    is
+      Current_Token : T_Buffer.Char_Buffer;
+      With_Str, Use_Str : SU.Unbounded_String := SU.Null_Unbounded_String;
+
    begin
-      D.Parse_Dependency (Backbone);
+
+      Current_Token := Backbone.Next;
+      Get_Until_Semicolon (With_Str, Backbone);
+
+      Current_Token := Backbone.Next;
+      if Current_Token.Kind = Constants.use_t then
+
+         Current_Token := Backbone.Next;
+         Get_Until_Semicolon (Use_Str, Backbone);
+
+      end if;
+
+      Expr := Expr.Make (Constants.with_t,  With_Str, Use_Str);
+
    end Parse;
 
    -----------
@@ -54,6 +95,15 @@ package body Expressions.Dependency is
    --------------
 
    overriding
+   procedure Accept_v (Expr      : in out Dependency_Expr;
+                       V         : Visitor_Int'Class;
+                       Backbone  : in out T_Buffer.AST_Backbone'Class)
+   is
+   begin
+      V.Visit_Expr (Expr, Backbone);
+   end Accept_v;
+
+   overriding
    procedure Accept_v (Expr   : Dependency_Expr;
                        V      : Visitor_Int'Class;
                        F      : in out File_Type)
@@ -61,55 +111,5 @@ package body Expressions.Dependency is
    begin
       V.Visit_Expr (Expr, F);
    end Accept_v;
-
-   -------------------------
-   -- Get_Until_Semicolon --
-   -------------------------
-
-   procedure Get_Until_Semicolon
-      (Str      : in out SU.Unbounded_String;
-       Backbone : in out T_Buffer.AST_Backbone'Class)
-   is
-      Current_Token : T_Buffer.Char_Buffer;
-
-   begin
-
-      Current_Token := Backbone.Current;
-
-      while Current_Token.Kind /= Constants.semi_colon_t loop
-
-         SU.Append (Str, Backbone.Current.Buffer_To_String);
-         Current_Token := Backbone.Next;
-
-      end loop;
-
-   end Get_Until_Semicolon;
-
-   ----------------------
-   -- Parse_Dependency --
-   ----------------------
-
-   procedure Parse_Dependency (D       : in out Dependency_Expr;
-                              Backbone : in out T_Buffer.AST_Backbone'Class)
-   is
-      Current_Token : T_Buffer.Char_Buffer;
-      With_Str, Use_Str : SU.Unbounded_String := SU.Null_Unbounded_String;
-
-   begin
-
-      Current_Token := Backbone.Next;
-      Get_Until_Semicolon (With_Str, Backbone);
-
-      Current_Token := Backbone.Next;
-      if Current_Token.Kind = Constants.use_t then
-
-         Current_Token := Backbone.Next;
-         Get_Until_Semicolon (Use_Str, Backbone);
-
-      end if;
-
-      D := D.Make (Constants.with_t,  With_Str, Use_Str);
-
-   end Parse_Dependency;
 
 end Expressions.Dependency;

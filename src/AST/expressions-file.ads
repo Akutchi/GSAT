@@ -21,13 +21,20 @@ package Expressions.File is
                   Container      : Container_Expr'Class)
    return File_Expr;
 
-   procedure Parse (F         : in out File_Expr;
+   overriding
+   procedure Parse (Expr      : in out File_Expr;
+                    V         : Visitor_Int'Class;
                     Backbone  : in out T_Buffer.AST_Backbone'Class);
 
    overriding
    procedure Print (Expr   : File_Expr;
                     V      : Visitor_Int'Class;
                     F      : in out File_Type);
+
+   overriding
+   procedure Accept_v (Expr      : in out File_Expr;
+                       V         : Visitor_Int'Class;
+                       Backbone  : in out T_Buffer.AST_Backbone'Class);
 
    overriding
    procedure Accept_v (Expr   : File_Expr;
@@ -43,8 +50,5 @@ private
       Container      : Container_Expr;
 
    end record;
-
-   procedure Parse_File (F_Expr     : in out File_Expr;
-                         Backbone   : in out T_Buffer.AST_Backbone'Class);
 
 end Expressions.File;

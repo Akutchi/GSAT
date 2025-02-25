@@ -1,10 +1,12 @@
 package body Visitor is
 
    overriding
-   procedure Visit_Expr (V : in out Visitor_Parse)
+   procedure Visit_Expr (V          : Visitor_Parse;
+                         Expr       : in out Expression'Class;
+                         Backbone   : in out T_Buffer.AST_Backbone'Class)
    is
    begin
-      V.F.Parse (V.Backbone);
+      Expr.Parse (V, Backbone);
    end Visit_Expr;
 
    overriding

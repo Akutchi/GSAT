@@ -41,20 +41,15 @@ begin
 
             declare
 
-               AST : File_Expr;
-
-               Backbone : constant T_Buffer.AST_Backbone :=
-               T_Buffer.Make (File, 1);
+               AST      : File_Expr;
+               Backbone : T_Buffer.AST_Backbone := T_Buffer.Make (File, 1);
 
             begin
 
-               AST               := AST.Make (Constants.file_t);
-               V_Parse.F         := AST;
-               V_Parse.Backbone  := Backbone;
+               null;
 
-               File.Accept_v (V_Parse);
-
-               AST := V_Parse.F;
+               AST := AST.Make (Constants.file_t);
+               AST.Accept_v (V_Parse, Backbone);
                AST.Accept_v (V_Print, F);
 
             end;

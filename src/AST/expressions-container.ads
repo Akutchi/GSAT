@@ -18,13 +18,20 @@ package Expressions.Container is
        Body_Expr           : Expr_List.Vector)
    return Container_Expr;
 
-   procedure Parse (C         : in out Container_Expr;
-                   Backbone   : in out T_Buffer.AST_Backbone'Class);
+   overriding
+   procedure Parse (Expr      : in out Container_Expr;
+                    V         : Visitor_Int'Class;
+                    Backbone  : in out T_Buffer.AST_Backbone'Class);
 
    overriding
    procedure Print (Expr   : Container_Expr;
                     V      : Visitor_Int'Class;
                     F      : in out File_Type);
+
+   overriding
+   procedure Accept_v (Expr      : in out Container_Expr;
+                       V         : Visitor_Int'Class;
+                       Backbone  : in out T_Buffer.AST_Backbone'Class);
 
    overriding
    procedure Accept_v (Expr   : Container_Expr;
@@ -41,8 +48,5 @@ private
       Body_Expr      : Expr_List.Vector;
 
    end record;
-
-   procedure Parse_Package (C         : in out Container_Expr;
-                           Backbone   : in out T_Buffer.AST_Backbone'Class);
 
 end Expressions.Container;

@@ -3,8 +3,6 @@ with Ada.Strings.Unbounded;
 
 with Constants;
 
-with Expressions; use Expressions;
-
 package T_Buffer is
 
    package SU renames Ada.Strings.Unbounded;
@@ -30,8 +28,6 @@ package T_Buffer is
    procedure Print (Buffer : Char_Buffer);
 
    type File_Buffer is tagged private;
-
-   procedure Accept_v (F : File_Buffer; V : in out Visitor_Int'Class);
 
    procedure Append
       (Buffer : in out File_Buffer'Class; C_Buffer : Char_Buffer);

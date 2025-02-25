@@ -194,12 +194,6 @@ package body T_Buffer is
       return Buffer.Char_Buffer_Vector (I);
    end Get;
 
-   procedure Accept_v (F : File_Buffer; V : in out Visitor_Int'Class)
-   is
-   begin
-      Visit_Expr (V);
-   end Accept_v;
-
    ---------------
    -- Get_Files --
    ---------------

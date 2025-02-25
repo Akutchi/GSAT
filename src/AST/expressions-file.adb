@@ -41,11 +41,40 @@ package body Expressions.File is
    -- Parse --
    -----------
 
-   procedure Parse (F : in out File_Expr;
-   Backbone : in out T_Buffer.AST_Backbone'Class)
+   overriding
+   procedure Parse (Expr      : in out File_Expr;
+                 V         : Visitor_Int'Class;
+                 Backbone  : in out T_Buffer.AST_Backbone'Class)
    is
+      F_Name         : SU.Unbounded_String;
+      Dependencies   : Expr_List.Vector := Expr_List.Empty_Vector;
+      Container      : Container_Expr;
+
+      Current_Token : T_Buffer.Char_Buffer;
+
    begin
-      F.Parse_File (Backbone);
+
+      F_Name := SU.To_Unbounded_String (T_Buffer.Buffer_To_String
+                                                         (Backbone.Current));
+
+      Current_Token := Backbone.Next;
+      while Current_Token.Kind = Constants.with_t loop
+
+         declare
+            D : Dependency_Expr;
+         begin
+
+            D.Accept_v (V, Backbone);
+            Dependencies.Append (D);
+            Current_Token := Backbone.Current;
+
+         end;
+      end loop;
+
+      Container.Parse (V, Backbone);
+
+      Expr := Expr.Make (F_Name, Dependencies, Container);
+
    end Parse;
 
    -----------
@@ -90,6 +119,15 @@ package body Expressions.File is
    --------------
 
    overriding
+   procedure Accept_v (Expr      : in out File_Expr;
+                       V         : Visitor_Int'Class;
+                       Backbone  : in out T_Buffer.AST_Backbone'Class)
+   is
+   begin
+      V.Visit_Expr (Expr, Backbone);
+   end Accept_v;
+
+   overriding
    procedure Accept_v (Expr   : File_Expr;
                        V      : Visitor_Int'Class;
                        F      : in out File_Type)
@@ -97,43 +135,5 @@ package body Expressions.File is
    begin
       V.Visit_Expr (Expr, F);
    end Accept_v;
-
-   ----------------
-   -- Parse_File --
-   ----------------
-
-   procedure Parse_File (F_Expr     : in out File_Expr;
-                         Backbone   : in out T_Buffer.AST_Backbone'Class)
-   is
-      F_Name         : SU.Unbounded_String;
-      Dependencies   : Expr_List.Vector := Expr_List.Empty_Vector;
-      Container      : Container_Expr;
-
-      Current_Token : T_Buffer.Char_Buffer;
-
-   begin
-
-      F_Name := SU.To_Unbounded_String (T_Buffer.Buffer_To_String
-                                                         (Backbone.Current));
-
-      Current_Token := Backbone.Next;
-      while Current_Token.Kind = Constants.with_t loop
-
-         declare
-            D : Dependency_Expr;
-         begin
-
-            D.Parse (Backbone);
-            Dependencies.Append (D);
-            Current_Token := Backbone.Current;
-
-         end;
-      end loop;
-
-      Container.Parse (Backbone);
-
-      F_Expr := F_Expr.Make (F_Name, Dependencies, Container);
-
-   end Parse_File;
 
 end Expressions.File;

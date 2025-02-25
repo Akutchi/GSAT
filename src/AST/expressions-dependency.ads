@@ -15,13 +15,20 @@ package Expressions.Dependency is
        With_Str, Use_Str   : SU.Unbounded_String := SU.Null_Unbounded_String)
    return Dependency_Expr;
 
-   procedure Parse (D          : in out Dependency_Expr;
-                    Backbone   : in out T_Buffer.AST_Backbone'Class);
+   overriding
+   procedure Parse (Expr      : in out Dependency_Expr;
+                    V         : Visitor_Int'Class;
+                    Backbone  : in out T_Buffer.AST_Backbone'Class);
 
    overriding
    procedure Print (Expr   : Dependency_Expr;
                     V      : Visitor_Int'Class;
                     F      : in out File_Type);
+
+   overriding
+   procedure Accept_v (Expr      : in out Dependency_Expr;
+                       V         : Visitor_Int'Class;
+                       Backbone  : in out T_Buffer.AST_Backbone'Class);
 
    overriding
    procedure Accept_v (Expr   : Dependency_Expr;
@@ -40,9 +47,5 @@ private
    procedure Get_Until_Semicolon
       (Str      : in out SU.Unbounded_String;
        Backbone : in out T_Buffer.AST_Backbone'Class);
-
-   procedure Parse_Dependency
-      (D          : in out Dependency_Expr;
-       Backbone   : in out T_Buffer.AST_Backbone'Class);
 
 end Expressions.Dependency;

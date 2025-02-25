@@ -45,7 +45,4 @@ private
       (D          : in out Dependency_Expr;
        Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print_With (Exp : Dependency_Expr; V      : Visitor_Int'Class;
-   F : in out File_Type);
-
 end Expressions.Dependency;

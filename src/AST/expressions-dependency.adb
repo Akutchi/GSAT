@@ -1,30 +1,5 @@
 package body Expressions.Dependency is
 
-   procedure Parse (D          : in out Dependency_Expr;
-                    Backbone   : in out T_Buffer.AST_Backbone'Class)
-   is
-   begin
-      D.Parse_Dependency (Backbone);
-   end Parse;
-
-   overriding
-   procedure Print (Expr   : Dependency_Expr;
-                    V      : Visitor_Int'Class;
-                    F      : in out File_Type)
-   is
-   begin
-      Expr.Print_With (V, F);
-   end Print;
-
-   overriding
-   procedure Accept_v (Expr   : Dependency_Expr;
-                       V      : Visitor_Int'Class;
-                       F      : in out File_Type)
-   is
-   begin
-      V.Visit_Dependency (Expr, F);
-   end Accept_v;
-
    ----------
    -- Make --
    ----------
@@ -40,6 +15,52 @@ package body Expressions.Dependency is
       return (Kind_T, With_Str, Use_Str);
 
    end Make;
+
+   -----------
+   -- Parse --
+   -----------
+
+   procedure Parse (D          : in out Dependency_Expr;
+                    Backbone   : in out T_Buffer.AST_Backbone'Class)
+   is
+   begin
+      D.Parse_Dependency (Backbone);
+   end Parse;
+
+   -----------
+   -- Print --
+   -----------
+
+   overriding
+   procedure Print (Expr : Dependency_Expr;
+                    V    : Visitor_Int'Class;
+                    F    : in out File_Type)
+   is
+   begin
+
+      if not SU."=" (Expr.With_Str, SU.Null_Unbounded_String) then
+         Put (F, "with " & SU.To_String (Expr.With_Str) & "; ");
+      end if;
+
+      if not SU."=" (Expr.Use_Str, SU.Null_Unbounded_String) then
+         Put_Line (F, "use " & SU.To_String (Expr.Use_Str) & "; ");
+         Put_Line (F, " ");
+      end if;
+
+   end Print;
+
+   --------------
+   -- Accept_v --
+   --------------
+
+   overriding
+   procedure Accept_v (Expr   : Dependency_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type)
+   is
+   begin
+      V.Visit_Dependency (Expr, F);
+   end Accept_v;
 
    -------------------------
    -- Get_Until_Semicolon --
@@ -90,26 +111,5 @@ package body Expressions.Dependency is
       D := D.Make (Constants.with_t,  With_Str, Use_Str);
 
    end Parse_Dependency;
-
-   ----------------
-   -- Print_With --
-   ----------------
-
-   procedure Print_With (Exp : Dependency_Expr; V      : Visitor_Int'Class;
-   F : in out File_Type)
-   is
-   begin
-
-      if not SU."=" (Exp.With_Str, SU.Null_Unbounded_String) then
-         Put (F, "with " & SU.To_String (Exp.With_Str) & "; ");
-      end if;
-
-      if not SU."=" (Exp.Use_Str, SU.Null_Unbounded_String) then
-         Put_Line (F, "use " & SU.To_String (Exp.Use_Str) & "; ");
-      end if;
-
-      Put_Line (F, " ");
-
-   end Print_With;
 
 end Expressions.Dependency;

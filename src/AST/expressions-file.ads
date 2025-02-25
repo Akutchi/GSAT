@@ -47,8 +47,4 @@ private
    procedure Parse_File (F_Expr     : in out File_Expr;
                          Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print_File (F_Expr : File_Expr;
-                         V      : Visitor_Int'Class;
-                         F      : in out File_Type);
-
 end Expressions.File;

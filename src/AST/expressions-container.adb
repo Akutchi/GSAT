@@ -1,30 +1,5 @@
 package body Expressions.Container is
 
-   procedure Parse (C         : in out Container_Expr;
-                   Backbone   : in out T_Buffer.AST_Backbone'Class)
-   is
-   begin
-      C.Parse_Package (Backbone);
-   end Parse;
-
-   overriding
-   procedure Print (Expr   : Container_Expr;
-                    V      : Visitor_Int'Class;
-                    F      : in out File_Type)
-   is
-   begin
-      Expr.Print_Package (V, F);
-   end Print;
-
-   overriding
-   procedure Accept_v (Expr   : Container_Expr;
-                       V      : Visitor_Int'Class;
-                       F      : in out File_Type)
-   is
-   begin
-      V.Visit_Container (Expr, F);
-   end Accept_v;
-
    ----------
    -- Make --
    ----------
@@ -44,6 +19,55 @@ package body Expressions.Container is
               Declarations => Declarations, Body_Expr => Body_Expr);
 
    end Make;
+
+   -----------
+   -- Parse --
+   -----------
+
+   procedure Parse (C         : in out Container_Expr;
+                   Backbone   : in out T_Buffer.AST_Backbone'Class)
+   is
+   begin
+      C.Parse_Package (Backbone);
+   end Parse;
+
+   -----------
+   -- Print --
+   -----------
+
+   overriding
+   procedure Print (Expr   : Container_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type)
+   is
+   begin
+
+      Put (F, "package ");
+
+      if Expr.Has_Body then
+         Put (F, "body ");
+      end if;
+
+      Put_Line (F, SU.To_String (Expr.Name) & " is");
+
+      Put_Line (F, "   null;");
+
+      Put_Line (F, "end " & SU.To_String (Expr.Name) & ";");
+
+   end Print;
+
+   --------------
+   -- Accept_v --
+   --------------
+
+   overriding
+   procedure Accept_v (Expr   : Container_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type)
+   is
+   begin
+      V.Visit_Container (Expr, F);
+   end Accept_v;
 
    -------------------
    -- Parse_Package --
@@ -80,28 +104,5 @@ package body Expressions.Container is
                    Body_Expr);
 
    end Parse_Package;
-
-   -------------------
-   -- Print_Package --
-   -------------------
-
-   procedure Print_Package (C : Container_Expr; V : Visitor_Int'Class;
-   F : in out File_Type)
-   is
-   begin
-
-      Put (F, "package ");
-
-      if C.Has_Body then
-         Put (F, "body ");
-      end if;
-
-      Put_Line (F, SU.To_String (C.Name) & " is");
-
-      Put_Line (F, "   null;");
-
-      Put_Line (F, "end " & SU.To_String (C.Name) & ";");
-
-   end Print_Package;
 
 end Expressions.Container;

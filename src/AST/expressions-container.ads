@@ -45,7 +45,4 @@ private
    procedure Parse_Package (C         : in out Container_Expr;
                            Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print_Package (C : Container_Expr; V : Visitor_Int'Class;
-   F : in out File_Type);
-
 end Expressions.Container;

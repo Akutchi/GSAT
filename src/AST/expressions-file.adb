@@ -2,31 +2,6 @@ with Expressions.Dependency; use Expressions.Dependency;
 
 package body Expressions.File is
 
-   procedure Parse (F : in out File_Expr;
-   Backbone : in out T_Buffer.AST_Backbone'Class)
-   is
-   begin
-      F.Parse_File (Backbone);
-   end Parse;
-
-   overriding
-   procedure Print (Expr   : File_Expr;
-                    V      : Visitor_Int'Class;
-                    F      : in out File_Type)
-   is
-   begin
-      Expr.Print_File (V, F);
-   end Print;
-
-   overriding
-   procedure Accept_v (Expr   : File_Expr;
-                       V      : Visitor_Int'Class;
-                       F      : in out File_Type)
-   is
-   begin
-      V.Visit_File (Expr, F);
-   end Accept_v;
-
    ----------
    -- Make --
    ----------
@@ -61,6 +36,67 @@ package body Expressions.File is
       return F_New;
 
    end Make;
+
+   -----------
+   -- Parse --
+   -----------
+
+   procedure Parse (F : in out File_Expr;
+   Backbone : in out T_Buffer.AST_Backbone'Class)
+   is
+   begin
+      F.Parse_File (Backbone);
+   end Parse;
+
+   -----------
+   -- Print --
+   -----------
+
+   overriding
+   procedure Print (Expr   : File_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type)
+   is
+      F_Name         : SU.Unbounded_String;
+      Absolute_Name  : constant String := SU.To_String (Expr.File_Name);
+
+   begin
+
+      for I in reverse Absolute_Name'Range loop
+
+         exit when Absolute_Name (I) = '/';
+         F_Name := SU."&" (Absolute_Name (I), F_Name);
+
+      end loop;
+
+      Create (F,
+              Out_File,
+              Constants.Generation_Src_Folder & SU.To_String (F_Name));
+
+      for Dependency of Expr.Dependencies loop
+         Dependency.Accept_v (V, F);
+      end loop;
+
+      Put_Line (F, " ");
+      Expr.Container.Print (V, F);
+      Put_Line (F, " ");
+
+      Close (F);
+
+   end Print;
+
+   --------------
+   -- Accept_v --
+   --------------
+
+   overriding
+   procedure Accept_v (Expr   : File_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type)
+   is
+   begin
+      V.Visit_File (Expr, F);
+   end Accept_v;
 
    ----------------
    -- Parse_File --
@@ -99,40 +135,5 @@ package body Expressions.File is
       F_Expr := F_Expr.Make (F_Name, Dependencies, Container);
 
    end Parse_File;
-
-   ----------------
-   -- Print_File --
-   ----------------
-
-   procedure Print_File (F_Expr : File_Expr; V : Visitor_Int'Class;
-    F : in out File_Type)
-   is
-      F_Name         : SU.Unbounded_String;
-      Absolute_Name  : constant String := SU.To_String (F_Expr.File_Name);
-
-   begin
-
-      for I in reverse Absolute_Name'Range loop
-
-         exit when Absolute_Name (I) = '/';
-         F_Name := SU."&" (Absolute_Name (I), F_Name);
-
-      end loop;
-
-      Create (F,
-              Out_File,
-              Constants.Generation_Src_Folder & SU.To_String (F_Name));
-
-      for Dependency of F_Expr.Dependencies loop
-         Dependency.Accept_v (V, F);
-      end loop;
-
-      Put_Line (F, " ");
-      F_Expr.Container.Print (V, F);
-      Put_Line (F, " ");
-
-      Close (F);
-
-   end Print_File;
 
 end Expressions.File;

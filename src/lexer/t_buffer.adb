@@ -1,3 +1,4 @@
+with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.Characters.Latin_1;  use Ada.Characters.Latin_1;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Containers;          use Ada.Containers;
@@ -197,13 +198,6 @@ package body T_Buffer is
    is
    begin
       Visit_File (V);
-   end Accept_v;
-
-   procedure Accept_v
-      (F : File_Buffer; V : in out Visitor_Int'Class; File : in out File_Type)
-   is
-   begin
-      Visit_File (V, File);
    end Accept_v;
 
    ---------------

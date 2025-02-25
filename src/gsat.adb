@@ -8,7 +8,7 @@ with T_Buffer;
 with Gsat_System;
 with Constants;
 
-with Visitor_Interface.Visitor;
+with Visitor;
 
 procedure Gsat is
 
@@ -18,8 +18,8 @@ procedure Gsat is
    Non_Textual_Keywords : Constants.Keyword.Map;
    --  Defined here so that It ought not to be re-Init at each file.
 
-   V_Parse : Visitor_Interface.Visitor.Visitor_Parse;
-   V_Print : Visitor_Interface.Visitor.Visitor_Print;
+   V_Parse : Visitor.Visitor_Parse;
+   V_Print : Visitor.Visitor_Print;
 
 begin
 
@@ -41,22 +41,21 @@ begin
 
             declare
 
-               F_Expr : File_Expr;
+               AST : File_Expr;
 
                Backbone : constant T_Buffer.AST_Backbone :=
                T_Buffer.Make (File, 1);
 
             begin
 
-               F_Expr            := F_Expr.Make (Constants.file_t);
-               V_Parse.F         := F_Expr;
+               AST               := AST.Make (Constants.file_t);
+               V_Parse.F         := AST;
                V_Parse.Backbone  := Backbone;
 
                File.Accept_v (V_Parse);
 
-               V_Print.AST := V_Parse.F;
-
-               File.Accept_v (V_Print, F);
+               AST := V_Parse.F;
+               AST.Accept_v (V_Print, F);
 
             end;
          end loop;

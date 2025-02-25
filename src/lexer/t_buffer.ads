@@ -1,11 +1,9 @@
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
 
 with Constants;
 
-with Visitor_Interface; use Visitor_Interface;
+with Expressions; use Expressions;
 
 package T_Buffer is
 
@@ -34,9 +32,6 @@ package T_Buffer is
    type File_Buffer is tagged private;
 
    procedure Accept_v (F : File_Buffer; V : in out Visitor_Int'Class);
-
-   procedure Accept_v
-      (F : File_Buffer; V : in out Visitor_Int'Class; File : in out File_Type);
 
    procedure Append
       (Buffer : in out File_Buffer'Class; C_Buffer : Char_Buffer);

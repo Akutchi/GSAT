@@ -1,5 +1,3 @@
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Ada.Strings.Unbounded;
 
 with Constants;
@@ -23,7 +21,15 @@ package Expressions.Container is
    procedure Parse (C         : in out Container_Expr;
                    Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print (C : Container_Expr; F : in out File_Type);
+   overriding
+   procedure Print (Expr   : Container_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type);
+
+   overriding
+   procedure Accept_v (Expr   : Container_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type);
 
 private
 
@@ -39,6 +45,7 @@ private
    procedure Parse_Package (C         : in out Container_Expr;
                            Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print_Package (C : Container_Expr; F : in out File_Type);
+   procedure Print_Package (C : Container_Expr; V : Visitor_Int'Class;
+   F : in out File_Type);
 
 end Expressions.Container;

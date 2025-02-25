@@ -9,11 +9,23 @@ package body Expressions.File is
       F.Parse_File (Backbone);
    end Parse;
 
-   procedure Print (F_Expr : File_Expr; F : in out File_Type)
+   overriding
+   procedure Print (Expr   : File_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type)
    is
    begin
-      F_Expr.Print_File (F);
+      Expr.Print_File (V, F);
    end Print;
+
+   overriding
+   procedure Accept_v (Expr   : File_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type)
+   is
+   begin
+      V.Visit_File (Expr, F);
+   end Accept_v;
 
    ----------
    -- Make --
@@ -92,7 +104,8 @@ package body Expressions.File is
    -- Print_File --
    ----------------
 
-   procedure Print_File (F_Expr : File_Expr; F : in out File_Type)
+   procedure Print_File (F_Expr : File_Expr; V : Visitor_Int'Class;
+    F : in out File_Type)
    is
       F_Name         : SU.Unbounded_String;
       Absolute_Name  : constant String := SU.To_String (F_Expr.File_Name);
@@ -111,11 +124,11 @@ package body Expressions.File is
               Constants.Generation_Src_Folder & SU.To_String (F_Name));
 
       for Dependency of F_Expr.Dependencies loop
-         Dependency_Expr (Dependency).Print (F);
+         Dependency.Accept_v (V, F);
       end loop;
 
       Put_Line (F, " ");
-      F_Expr.Container.Print (F);
+      F_Expr.Container.Print (V, F);
       Put_Line (F, " ");
 
       Close (F);

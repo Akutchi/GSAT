@@ -1,5 +1,3 @@
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Ada.Strings.Unbounded;
 
 with Constants;
@@ -20,7 +18,15 @@ package Expressions.Dependency is
    procedure Parse (D          : in out Dependency_Expr;
                     Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print (D : Dependency_Expr; F : in out File_Type);
+   overriding
+   procedure Print (Expr   : Dependency_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type);
+
+   overriding
+   procedure Accept_v (Expr   : Dependency_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type);
 
 private
 
@@ -39,6 +45,7 @@ private
       (D          : in out Dependency_Expr;
        Backbone   : in out T_Buffer.AST_Backbone'Class);
 
-   procedure Print_With (Exp : Dependency_Expr; F : in out File_Type);
+   procedure Print_With (Exp : Dependency_Expr; V      : Visitor_Int'Class;
+   F : in out File_Type);
 
 end Expressions.Dependency;

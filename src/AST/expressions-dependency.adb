@@ -7,11 +7,23 @@ package body Expressions.Dependency is
       D.Parse_Dependency (Backbone);
    end Parse;
 
-   procedure Print (D : Dependency_Expr; F : in out File_Type)
+   overriding
+   procedure Print (Expr   : Dependency_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type)
    is
    begin
-      D.Print_With (F);
+      Expr.Print_With (V, F);
    end Print;
+
+   overriding
+   procedure Accept_v (Expr   : Dependency_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type)
+   is
+   begin
+      V.Visit_Dependency (Expr, F);
+   end Accept_v;
 
    ----------
    -- Make --
@@ -83,7 +95,8 @@ package body Expressions.Dependency is
    -- Print_With --
    ----------------
 
-   procedure Print_With (Exp : Dependency_Expr; F : in out File_Type)
+   procedure Print_With (Exp : Dependency_Expr; V      : Visitor_Int'Class;
+   F : in out File_Type)
    is
    begin
 

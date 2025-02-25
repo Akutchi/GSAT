@@ -7,11 +7,23 @@ package body Expressions.Container is
       C.Parse_Package (Backbone);
    end Parse;
 
-   procedure Print (C : Container_Expr; F : in out File_Type)
+   overriding
+   procedure Print (Expr   : Container_Expr;
+                    V      : Visitor_Int'Class;
+                    F      : in out File_Type)
    is
    begin
-      C.Print_Package (F);
+      Expr.Print_Package (V, F);
    end Print;
+
+   overriding
+   procedure Accept_v (Expr   : Container_Expr;
+                       V      : Visitor_Int'Class;
+                       F      : in out File_Type)
+   is
+   begin
+      V.Visit_Container (Expr, F);
+   end Accept_v;
 
    ----------
    -- Make --
@@ -73,7 +85,8 @@ package body Expressions.Container is
    -- Print_Package --
    -------------------
 
-   procedure Print_Package (C : Container_Expr; F : in out File_Type)
+   procedure Print_Package (C : Container_Expr; V : Visitor_Int'Class;
+   F : in out File_Type)
    is
    begin
 

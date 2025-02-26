@@ -49,6 +49,7 @@ package body Expressions.Container is
       elsif Current_Token.Kind = Constants.body_t then
 
          Has_Body := True;
+         Current_Token := Backbone.Next;
          Name := Expressions_Utils.Get_Dotted_Name (Backbone);
       end if;
 

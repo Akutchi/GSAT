@@ -60,7 +60,7 @@ begin
 
                null;
 
-               AST := AST.Make (Constants.file_t);
+               AST := AST.Make (Constants.source_file_t);
                AST.Accept_v (V_Parse, Backbone);
                AST.Accept_v (V_Print, F);
 

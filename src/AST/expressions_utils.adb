@@ -7,7 +7,7 @@ package body Expressions_Utils is
    is
       Name : SU.Unbounded_String := SU.Null_Unbounded_String;
 
-      Current_Token : T_Buffer.Char_Buffer := Backbone.Next;
+      Current_Token : T_Buffer.Char_Buffer := Backbone.Current;
    begin
 
       while Current_Token.Kind = Constants.identifier_t or else

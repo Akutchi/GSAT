@@ -65,7 +65,7 @@ package Constants is
       text_t,        --  text
       comment_t,
 
-      file_t,        --  misc
+      source_file_t, --  misc
       identifier_t,
       nil_t
    );

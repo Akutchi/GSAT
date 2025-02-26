@@ -80,7 +80,7 @@ package body Processing_Utils is
       --  Using Open files names are absolute and thus always start with a /
       elsif First_Char = '/' then
          Is_Edge_Case := True;
-         return Constants.file_t;
+         return Constants.source_file_t;
 
       elsif Str = "mod" then
          Is_Edge_Case := True;

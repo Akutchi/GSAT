@@ -23,6 +23,7 @@ package Expressions.Dependency is
    overriding
    procedure Print (Expr   : Dependency_Expr;
                     V      : Visitor_Int'Class;
+                    Tabs   : Natural;
                     F      : in out File_Type);
 
    overriding
@@ -33,6 +34,7 @@ package Expressions.Dependency is
    overriding
    procedure Accept_v (Expr   : Dependency_Expr;
                        V      : Visitor_Int'Class;
+                       Tabs   : Natural;
                        F      : in out File_Type);
 
 private

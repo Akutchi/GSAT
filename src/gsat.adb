@@ -19,7 +19,7 @@ procedure Gsat is
 
    Code_Tokens : T_Buffer.Code_Buffer;
    Non_Textual_Keywords : Constants.Keyword.Map;
-   --  Defined here so that It ought not to be re-Init at each file.
+   --  Defined here so that it ought not to be re-Init at each file.
 
    V_Parse : Visitor.Visitor_Parse;
    V_Print : Visitor.Visitor_Print;
@@ -32,7 +32,7 @@ begin
          Src_Path : constant String :=
             Gsat_System.Parse_Src (CLI.Argument (1));
 
-         F        : File_Type;
+         F : File_Type;
 
          Start_Time  : Time;
          End_Time    : Time;
@@ -49,8 +49,6 @@ begin
 
          for File of Code_Tokens.Get_Files loop
 
-            --  T_Buffer.Print (File);
-
             declare
 
                AST      : File_Expr;
@@ -62,7 +60,7 @@ begin
 
                AST := AST.Make (Constants.source_file_t);
                AST.Accept_v (V_Parse, Backbone);
-               AST.Accept_v (V_Print, F);
+               AST.Accept_v (V_Print, Constants.NO_TAB, F);
 
             end;
          end loop;

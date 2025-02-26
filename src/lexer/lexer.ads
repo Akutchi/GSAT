@@ -1,8 +1,9 @@
 with Ada.Text_IO;              use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
 
+with Constants; use Constants;
+
 with T_Buffer;
-with Constants;
 
 package Lexer is
 

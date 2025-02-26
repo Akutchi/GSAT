@@ -26,6 +26,7 @@ package Expressions.Container is
    overriding
    procedure Print (Expr   : Container_Expr;
                     V      : Visitor_Int'Class;
+                    Tabs   : Natural;
                     F      : in out File_Type);
 
    overriding
@@ -36,6 +37,7 @@ package Expressions.Container is
    overriding
    procedure Accept_v (Expr   : Container_Expr;
                        V      : Visitor_Int'Class;
+                       Tabs   : Natural;
                        F      : in out File_Type);
 
 private

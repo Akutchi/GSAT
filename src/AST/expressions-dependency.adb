@@ -76,6 +76,7 @@ package body Expressions.Dependency is
    overriding
    procedure Print (Expr : Dependency_Expr;
                     V    : Visitor_Int'Class;
+                    Tabs : Natural;
                     F    : in out File_Type)
    is
    begin
@@ -108,10 +109,11 @@ package body Expressions.Dependency is
    overriding
    procedure Accept_v (Expr   : Dependency_Expr;
                        V      : Visitor_Int'Class;
+                       Tabs   : Natural;
                        F      : in out File_Type)
    is
    begin
-      V.Visit_Expr (Expr, F);
+      V.Visit_Expr (Expr, Tabs, F);
    end Accept_v;
 
 end Expressions.Dependency;

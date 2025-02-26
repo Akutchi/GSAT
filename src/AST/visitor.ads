@@ -22,6 +22,7 @@ package Visitor is
    overriding
    procedure Visit_Expr (V    : Visitor_Parse;
                          Expr : Expression'Class;
+                         Tabs : Natural;
                          File : in out File_Type)
    is null;
 
@@ -40,6 +41,7 @@ package Visitor is
    overriding
    procedure Visit_Expr (V    : Visitor_Print;
                          Expr : Expression'Class;
+                         Tabs : Natural;
                          File : in out File_Type);
 
 end Visitor;

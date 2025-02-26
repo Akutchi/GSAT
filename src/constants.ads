@@ -6,6 +6,9 @@ package Constants is
    Generation_Folder       : constant String := "./obj/gen/";
    Generation_Src_Folder   : constant String := "./obj/gen/src/";
 
+   NO_TAB   : constant Natural := 0;
+   TAB      : constant Natural := 3;
+
    type Lex_Type is (
 
       with_t,        --  package
@@ -67,6 +70,7 @@ package Constants is
 
       source_file_t, --  misc
       identifier_t,
+      source_declaration_t,
       nil_t
    );
 

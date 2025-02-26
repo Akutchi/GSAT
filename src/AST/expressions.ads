@@ -24,6 +24,7 @@ package Expressions is
 
    procedure Print (Expr   : Expression;
                     V      : Visitor_Int'Class;
+                    Tabs   : Natural;
                     F      : in out File_Type)
    is abstract;
 
@@ -34,6 +35,7 @@ package Expressions is
 
    procedure Accept_v (Expr   : Expression;
                        V      : Visitor_Int'Class;
+                       Tabs   : Natural;
                        F      : in out File_Type)
    is abstract;
 
@@ -44,6 +46,7 @@ package Expressions is
 
    procedure Visit_Expr (V    : Visitor_Int;
                          Expr : Expression'Class;
+                         Tabs : Natural;
                          File : in out File_Type)
    is abstract;
 

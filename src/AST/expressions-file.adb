@@ -22,7 +22,7 @@ package body Expressions.File is
    function Make (F              : File_Expr;
                   F_Name         : SU.Unbounded_String;
                   Dependencies   : Expr_List.Vector;
-                  Container      : Container_Expr'Class)
+                  Container      : Container_Expr)
    return File_Expr
    is
       F_New : File_Expr;
@@ -31,7 +31,7 @@ package body Expressions.File is
       F_New.Kind_T := F.Kind_T;
       F_New.File_Name   := F_Name;
       F_New.Dependencies := Dependencies;
-      F_New.Container := Container_Expr (Container);
+      F_New.Container := Container;
 
       return F_New;
 
@@ -84,6 +84,7 @@ package body Expressions.File is
    overriding
    procedure Print (Expr   : File_Expr;
                     V      : Visitor_Int'Class;
+                    Tabs   : Natural;
                     F      : in out File_Type)
    is
       F_Name         : SU.Unbounded_String;
@@ -103,11 +104,11 @@ package body Expressions.File is
               Constants.Generation_Src_Folder & SU.To_String (F_Name));
 
       for Dependency of Expr.Dependencies loop
-         Dependency.Accept_v (V, F);
+         Dependency.Accept_v (V, Tabs, F);
       end loop;
 
       Put_Line (F, " ");
-      Expr.Container.Accept_v (V, F);
+      Expr.Container.Accept_v (V, Tabs, F);
       Put_Line (F, " ");
 
       Close (F);
@@ -130,10 +131,11 @@ package body Expressions.File is
    overriding
    procedure Accept_v (Expr   : File_Expr;
                        V      : Visitor_Int'Class;
+                       Tabs   : Natural;
                        F      : in out File_Type)
    is
    begin
-      V.Visit_Expr (Expr, F);
+      V.Visit_Expr (Expr, Tabs, F);
    end Accept_v;
 
 end Expressions.File;

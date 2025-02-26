@@ -1,3 +1,5 @@
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
+
 with Processing_Utils;
 
 package body Lexer is
@@ -9,8 +11,8 @@ package body Lexer is
 
       File_Tokens : T_Buffer.File_Buffer;
 
-      In_Text  : Boolean := False;
-      Char     : Character := '$';
+      In_Text, Is_Comment  : Boolean := False;
+      Char                 : Character := '$';
 
       Name_Buffer : T_Buffer.Char_Buffer;
 
@@ -24,7 +26,6 @@ package body Lexer is
 
          declare
             Buffer : T_Buffer.Char_Buffer;
-
          begin
 
             loop
@@ -42,16 +43,29 @@ package body Lexer is
             Buffer.Freeze (Using => Non_Textual_Keywords);
             File_Tokens.Append (Buffer);
 
+            if Buffer.Kind = Constants.comment_t then
+               Is_Comment := True;
+            end if;
+
+            if Char = LF and then Is_Comment then
+               declare
+                  End_Comment_Buffer : T_Buffer.Char_Buffer;
+               begin
+                  End_Comment_Buffer.Append ("--");
+                  End_Comment_Buffer.Freeze (Using => Non_Textual_Keywords);
+                  File_Tokens.Append (End_Comment_Buffer);
+                  Is_Comment := False;
+               end;
+            end if;
+
             if Processing_Utils.EOL (Char, In_Text) then
 
                declare
                   Buffer : T_Buffer.Char_Buffer;
-
                begin
                   Buffer.Append (Char);
                   Buffer.Freeze (Using => Non_Textual_Keywords);
                   File_Tokens.Append (Buffer);
-
                end;
             end if;
 

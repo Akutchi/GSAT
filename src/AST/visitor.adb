@@ -12,10 +12,11 @@ package body Visitor is
    overriding
    procedure Visit_Expr (V    : Visitor_Print;
                          Expr : Expression'Class;
+                         Tabs : Natural;
                          File : in out File_Type)
    is
    begin
-      Expr.Print (V, File);
+      Expr.Print (V, Tabs, File);
    end Visit_Expr;
 
 end Visitor;

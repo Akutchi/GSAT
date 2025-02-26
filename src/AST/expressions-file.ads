@@ -18,7 +18,7 @@ package Expressions.File is
    function Make (F              : File_Expr;
                   F_Name         : SU.Unbounded_String;
                   Dependencies   : Expr_List.Vector;
-                  Container      : Container_Expr'Class)
+                  Container      : Container_Expr)
    return File_Expr;
 
    overriding
@@ -29,6 +29,7 @@ package Expressions.File is
    overriding
    procedure Print (Expr   : File_Expr;
                     V      : Visitor_Int'Class;
+                    Tabs   : Natural;
                     F      : in out File_Type);
 
    overriding
@@ -39,6 +40,7 @@ package Expressions.File is
    overriding
    procedure Accept_v (Expr   : File_Expr;
                        V      : Visitor_Int'Class;
+                       Tabs   : Natural;
                        F      : in out File_Type);
 
 private

@@ -37,9 +37,9 @@ package Expressions is
                        F      : in out File_Type)
    is abstract;
 
-    procedure Visit_Expr (V         : Visitor_Int;
-                         Expr       : in out Expression'Class;
-                         Backbone   : in out T_Buffer.AST_Backbone'Class)
+   procedure Visit_Expr (V         : Visitor_Int;
+                         Expr      : in out Expression'Class;
+                         Backbone  : in out T_Buffer.AST_Backbone'Class)
    is abstract;
 
    procedure Visit_Expr (V    : Visitor_Int;

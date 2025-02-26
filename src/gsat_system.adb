@@ -42,7 +42,7 @@ package body Gsat_System is
                 Duration_Str (First .. Two_Commas) & " " & ESC & "[0m" &
                 "seconds.");
 
-   end Show_Duration; --  f
+   end Show_Duration;
 
    ---------------
    -- Parse_Src --
@@ -306,6 +306,8 @@ package body Gsat_System is
    return Status
    is
    begin
+
+      return CHANGED;
 
       if Current_Sgt = Empty_Signature then
          return NOT_EXIST;

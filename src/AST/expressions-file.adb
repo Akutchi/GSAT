@@ -43,8 +43,8 @@ package body Expressions.File is
 
    overriding
    procedure Parse (Expr      : in out File_Expr;
-                 V         : Visitor_Int'Class;
-                 Backbone  : in out T_Buffer.AST_Backbone'Class)
+                    V         : Visitor_Int'Class;
+                    Backbone  : in out T_Buffer.AST_Backbone'Class)
    is
       F_Name         : SU.Unbounded_String;
       Dependencies   : Expr_List.Vector := Expr_List.Empty_Vector;
@@ -66,12 +66,12 @@ package body Expressions.File is
 
             D.Accept_v (V, Backbone);
             Dependencies.Append (D);
-            Current_Token := Backbone.Current;
+            Current_Token := Backbone.Next;
 
          end;
       end loop;
 
-      Container.Parse (V, Backbone);
+      Container.Accept_v (V, Backbone);
 
       Expr := Expr.Make (F_Name, Dependencies, Container);
 
@@ -107,7 +107,7 @@ package body Expressions.File is
       end loop;
 
       Put_Line (F, " ");
-      Expr.Container.Print (V, F);
+      Expr.Container.Accept_v (V, F);
       Put_Line (F, " ");
 
       Close (F);

@@ -190,7 +190,13 @@ package body T_Buffer is
 
    function Get (Buffer : File_Buffer'Class; I : Positive) return Char_Buffer
    is
+      Buffer_End : Char_Buffer;
    begin
+
+      if I > Positive (Buffer.Char_Buffer_Vector.Length) then
+         return Buffer_End;
+      end if;
+
       return Buffer.Char_Buffer_Vector (I);
    end Get;
 
@@ -261,6 +267,16 @@ package body T_Buffer is
       return Backbone.File.Get (Backbone.Pos);
 
    end Next;
+
+   ----------------
+   -- Look_Ahead --
+   ----------------
+
+   function Look_Ahead (Backbone : AST_Backbone'Class) return Char_Buffer
+   is
+   begin
+      return Backbone.File.Get (Backbone.Pos + 1);
+   end Look_Ahead;
 
    -----------
    -- Print --

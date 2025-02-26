@@ -58,6 +58,8 @@ package T_Buffer is
 
    function Next (Backbone : in out AST_Backbone'Class) return Char_Buffer;
 
+   function Look_Ahead (Backbone : AST_Backbone'Class) return Char_Buffer;
+
 private
 
    package Char_Buffer_V is new Ada.Containers.Indefinite_Vectors

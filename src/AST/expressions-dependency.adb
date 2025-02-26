@@ -56,9 +56,10 @@ package body Expressions.Dependency is
       Current_Token := Backbone.Next;
       Get_Until_Semicolon (With_Str, Backbone);
 
-      Current_Token := Backbone.Next;
+      Current_Token := Backbone.Look_Ahead;
       if Current_Token.Kind = Constants.use_t then
 
+         Current_Token := Backbone.Next;
          Current_Token := Backbone.Next;
          Get_Until_Semicolon (Use_Str, Backbone);
 
@@ -84,9 +85,10 @@ package body Expressions.Dependency is
       end if;
 
       if not SU."=" (Expr.Use_Str, SU.Null_Unbounded_String) then
-         Put_Line (F, "use " & SU.To_String (Expr.Use_Str) & "; ");
-         Put_Line (F, " ");
+         Put (F, "use " & SU.To_String (Expr.Use_Str) & "; ");
       end if;
+
+      Put_Line (F, " ");
 
    end Print;
 

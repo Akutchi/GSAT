@@ -1,3 +1,5 @@
+with Expressions_Utils;
+
 package body Expressions.Container is
 
    ----------
@@ -42,12 +44,12 @@ package body Expressions.Container is
 
       if Current_Token.Kind = Constants.identifier_t then
 
-         Name := SU.To_Unbounded_String (Current_Token.Buffer_To_String);
+         Name := Expressions_Utils.Get_Dotted_Name (Backbone);
 
       elsif Current_Token.Kind = Constants.body_t then
 
          Has_Body := True;
-         Name := SU.To_Unbounded_String (Backbone.Next.Buffer_To_String);
+         Name := Expressions_Utils.Get_Dotted_Name (Backbone);
       end if;
 
       Expr := Expr.Make (Constants.package_t,
@@ -76,8 +78,6 @@ package body Expressions.Container is
       end if;
 
       Put_Line (F, SU.To_String (Expr.Name) & " is");
-
-      Put_Line (F, "   null;");
 
       Put_Line (F, "end " & SU.To_String (Expr.Name) & ";");
 

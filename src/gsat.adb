@@ -49,6 +49,8 @@ begin
 
          for File of Code_Tokens.Get_Files loop
 
+            --  T_Buffer.Print (File);
+
             declare
 
                AST      : File_Expr;
@@ -65,8 +67,6 @@ begin
             end;
          end loop;
 
-         delay 2.0;
-
          End_Time := Clock;
          Gsat_System.Show_Duration (End_Time - Start_Time);
       end;
@@ -74,6 +74,10 @@ begin
    else
       Gsat_System.Show_Grey_Text ("Nothing to transpile, abort.");
    end if;
+
+   Put_Line
+   ("BEWARE Has_Signature_Changed is put to 'return CHANGED' for dev " &
+   "purposes");
 
 exception
 

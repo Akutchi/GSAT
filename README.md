@@ -37,3 +37,30 @@ begin
     --  ...
 end;
 ```
+## Progress
+As of the 25/02/25, I can re-generate this much of the [gsat.adb](./src/gsat.adb) file : 
+```ada
+with Ada.Text_IO; use Ada.Text_IO;  
+with Ada.Exceptions; use Ada.Exceptions;  
+with Ada.Calendar; use Ada.Calendar;  
+with Ada.Command_Line;  
+with Expressions.File; use Expressions.File;  
+with Exceptions.Arguments; use Exceptions.Arguments;  
+with T_Buffer;  
+with Gsat_System;  
+with Constants;  
+with Visitor;  
+ 
+procedure Gsat is
+ 
+   package CLI renames Ada.Command_Line;
+   Code_Tokens : T_Buffer.Code_Buffer;
+   Non_Textual_Keywords : Constants.Keyword.Map;
+   --   Defined here so that It ought not to be re-Init at each file .
+   V_Parse : Visitor.Visitor_Parse;
+   V_Print : Visitor.Visitor_Print;
+ 
+begin
+ 
+end Gsat;
+```
